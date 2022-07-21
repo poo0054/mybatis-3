@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+       Copyright 2009-2022 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.poo0054.dao.SysUserDao">
+
+  <resultMap type="com.poo0054.entity.SysUser" id="SysUserMap">
+    <result property="id" column="id" jdbcType="INTEGER"/>
+    <result property="loginname" column="loginName" jdbcType="VARCHAR"/>
+    <result property="password" column="password" jdbcType="VARCHAR"/>
+    <result property="customercode" column="customerCode" jdbcType="VARCHAR"/>
+    <result property="companycode" column="companyCode" jdbcType="VARCHAR"/>
+    <result property="username" column="userName" jdbcType="VARCHAR"/>
+    <result property="tel" column="tel" jdbcType="VARCHAR"/>
+    <result property="email" column="email" jdbcType="VARCHAR"/>
+    <result property="wxopenid" column="wxOpenId" jdbcType="VARCHAR"/>
+    <result property="lastlogintime" column="lastLoginTime" jdbcType="TIMESTAMP"/>
+    <result property="companyadmin" column="companyAdmin" jdbcType="INTEGER"/>
+    <result property="enablestatus" column="enableStatus" jdbcType="INTEGER"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="createuserid" column="createUserId" jdbcType="INTEGER"/>
+    <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+    <result property="updateuserid" column="updateUserId" jdbcType="INTEGER"/>
+    <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+    <result property="telvalidate" column="telValidate" jdbcType="INTEGER"/>
+    <result property="onlineid" column="onlineId" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!--查询单个-->
+  <select id="queryById" resultMap="SysUserMap">
+    select id,
+           loginName,
+           password,
+           customerCode,
+           companyCode,
+           userName,
+           tel,
+           email,
+           wxOpenId,
+           lastLoginTime,
+           companyAdmin,
+           enableStatus,
+           remark,
+           createUserId,
+           createTime,
+           updateUserId,
+           updateTime,
+           telValidate,
+           onlineId
+    from sys_user
+    where id = #{id}
+  </select>
+
+  <!--查询指定行数据-->
+  <select id="queryAllByLimit" resultMap="SysUserMap">
+    select
+    id, loginName, password, customerCode, companyCode, userName, tel, email, wxOpenId, lastLoginTime, companyAdmin,
+    enableStatus, remark, createUserId, createTime, updateUserId, updateTime, telValidate, onlineId
+    from sys_user
+    <where>
+      <if test="id != null">
+        and id = #{id}
+      </if>
+      <if test="loginname != null and loginname != ''">
+        and loginName = #{loginname}
+      </if>
+      <if test="password != null and password != ''">
+        and password = #{password}
+      </if>
+      <if test="customercode != null and customercode != ''">
+        and customerCode = #{customercode}
+      </if>
+      <if test="companycode != null and companycode != ''">
+        and companyCode = #{companycode}
+      </if>
+      <if test="username != null and username != ''">
+        and userName = #{username}
+      </if>
+      <if test="tel != null and tel != ''">
+        and tel = #{tel}
+      </if>
+      <if test="email != null and email != ''">
+        and email = #{email}
+      </if>
+      <if test="wxopenid != null and wxopenid != ''">
+        and wxOpenId = #{wxopenid}
+      </if>
+      <if test="lastlogintime != null">
+        and lastLoginTime = #{lastlogintime}
+      </if>
+      <if test="companyadmin != null">
+        and companyAdmin = #{companyadmin}
+      </if>
+      <if test="enablestatus != null">
+        and enableStatus = #{enablestatus}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="createuserid != null">
+        and createUserId = #{createuserid}
+      </if>
+      <if test="createtime != null">
+        and createTime = #{createtime}
+      </if>
+      <if test="updateuserid != null">
+        and updateUserId = #{updateuserid}
+      </if>
+      <if test="updatetime != null">
+        and updateTime = #{updatetime}
+      </if>
+      <if test="telvalidate != null">
+        and telValidate = #{telvalidate}
+      </if>
+      <if test="onlineid != null and onlineid != ''">
+        and onlineId = #{onlineid}
+      </if>
+    </where>
+    limit #{pageable.offset}, #{pageable.pageSize}
+  </select>
+
+  <!--统计总行数-->
+  <select id="count" resultType="java.lang.Long">
+    select count(1)
+    from sys_user
+    <where>
+      <if test="id != null">
+        and id = #{id}
+      </if>
+      <if test="loginname != null and loginname != ''">
+        and loginName = #{loginname}
+      </if>
+      <if test="password != null and password != ''">
+        and password = #{password}
+      </if>
+      <if test="customercode != null and customercode != ''">
+        and customerCode = #{customercode}
+      </if>
+      <if test="companycode != null and companycode != ''">
+        and companyCode = #{companycode}
+      </if>
+      <if test="username != null and username != ''">
+        and userName = #{username}
+      </if>
+      <if test="tel != null and tel != ''">
+        and tel = #{tel}
+      </if>
+      <if test="email != null and email != ''">
+        and email = #{email}
+      </if>
+      <if test="wxopenid != null and wxopenid != ''">
+        and wxOpenId = #{wxopenid}
+      </if>
+      <if test="lastlogintime != null">
+        and lastLoginTime = #{lastlogintime}
+      </if>
+      <if test="companyadmin != null">
+        and companyAdmin = #{companyadmin}
+      </if>
+      <if test="enablestatus != null">
+        and enableStatus = #{enablestatus}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="createuserid != null">
+        and createUserId = #{createuserid}
+      </if>
+      <if test="createtime != null">
+        and createTime = #{createtime}
+      </if>
+      <if test="updateuserid != null">
+        and updateUserId = #{updateuserid}
+      </if>
+      <if test="updatetime != null">
+        and updateTime = #{updatetime}
+      </if>
+      <if test="telvalidate != null">
+        and telValidate = #{telvalidate}
+      </if>
+      <if test="onlineid != null and onlineid != ''">
+        and onlineId = #{onlineid}
+      </if>
+    </where>
+  </select>
+
+  <!--新增所有列-->
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into sys_user(loginName, password, customerCode, companyCode, userName, tel, email, wxOpenId, lastLoginTime,
+                         companyAdmin, enableStatus, remark, createUserId, createTime, updateUserId, updateTime,
+                         telValidate, onlineId)
+    values (#{loginname}, #{password}, #{customercode}, #{companycode}, #{username}, #{tel}, #{email}, #{wxopenid},
+            #{lastlogintime}, #{companyadmin}, #{enablestatus}, #{remark}, #{createuserid}, #{createtime},
+            #{updateuserid},
+            #{updatetime}, #{telvalidate}, #{onlineid})
+  </insert>
+
+  <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+    insert into sys_user(loginName, password, customerCode, companyCode, userName, tel, email, wxOpenId, lastLoginTime,
+    companyAdmin, enableStatus, remark, createUserId, createTime, updateUserId, updateTime, telValidate, onlineId)
+    values
+    <foreach collection="entities" item="entity" separator=",">
+      (#{entity.loginname}, #{entity.password}, #{entity.customercode}, #{entity.companycode}, #{entity.username},
+      #{entity.tel}, #{entity.email}, #{entity.wxopenid}, #{entity.lastlogintime}, #{entity.companyadmin},
+      #{entity.enablestatus}, #{entity.remark}, #{entity.createuserid}, #{entity.createtime}, #{entity.updateuserid},
+      #{entity.updatetime}, #{entity.telvalidate}, #{entity.onlineid})
+    </foreach>
+  </insert>
+
+  <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+    insert into sys_user(loginName, password, customerCode, companyCode, userName, tel, email, wxOpenId, lastLoginTime,
+    companyAdmin, enableStatus, remark, createUserId, createTime, updateUserId, updateTime, telValidate, onlineId)
+    values
+    <foreach collection="entities" item="entity" separator=",">
+      (#{entity.loginname}, #{entity.password}, #{entity.customercode}, #{entity.companycode}, #{entity.username},
+      #{entity.tel}, #{entity.email}, #{entity.wxopenid}, #{entity.lastlogintime}, #{entity.companyadmin},
+      #{entity.enablestatus}, #{entity.remark}, #{entity.createuserid}, #{entity.createtime}, #{entity.updateuserid},
+      #{entity.updatetime}, #{entity.telvalidate}, #{entity.onlineid})
+    </foreach>
+    on duplicate key update
+    loginName = values(loginName),
+    password = values(password),
+    customerCode = values(customerCode),
+    companyCode = values(companyCode),
+    userName = values(userName),
+    tel = values(tel),
+    email = values(email),
+    wxOpenId = values(wxOpenId),
+    lastLoginTime = values(lastLoginTime),
+    companyAdmin = values(companyAdmin),
+    enableStatus = values(enableStatus),
+    remark = values(remark),
+    createUserId = values(createUserId),
+    createTime = values(createTime),
+    updateUserId = values(updateUserId),
+    updateTime = values(updateTime),
+    telValidate = values(telValidate),
+    onlineId = values(onlineId)
+  </insert>
+
+  <!--通过主键修改数据-->
+  <update id="update">
+    update sys_user
+    <set>
+      <if test="loginname != null and loginname != ''">
+        loginName = #{loginname},
+      </if>
+      <if test="password != null and password != ''">
+        password = #{password},
+      </if>
+      <if test="customercode != null and customercode != ''">
+        customerCode = #{customercode},
+      </if>
+      <if test="companycode != null and companycode != ''">
+        companyCode = #{companycode},
+      </if>
+      <if test="username != null and username != ''">
+        userName = #{username},
+      </if>
+      <if test="tel != null and tel != ''">
+        tel = #{tel},
+      </if>
+      <if test="email != null and email != ''">
+        email = #{email},
+      </if>
+      <if test="wxopenid != null and wxopenid != ''">
+        wxOpenId = #{wxopenid},
+      </if>
+      <if test="lastlogintime != null">
+        lastLoginTime = #{lastlogintime},
+      </if>
+      <if test="companyadmin != null">
+        companyAdmin = #{companyadmin},
+      </if>
+      <if test="enablestatus != null">
+        enableStatus = #{enablestatus},
+      </if>
+      <if test="remark != null and remark != ''">
+        remark = #{remark},
+      </if>
+      <if test="createuserid != null">
+        createUserId = #{createuserid},
+      </if>
+      <if test="createtime != null">
+        createTime = #{createtime},
+      </if>
+      <if test="updateuserid != null">
+        updateUserId = #{updateuserid},
+      </if>
+      <if test="updatetime != null">
+        updateTime = #{updatetime},
+      </if>
+      <if test="telvalidate != null">
+        telValidate = #{telvalidate},
+      </if>
+      <if test="onlineid != null and onlineid != ''">
+        onlineId = #{onlineid},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+
+  <!--通过主键删除-->
+  <delete id="deleteById">
+    delete
+    from sys_user
+    where id = #{id}
+  </delete>
+
+</mapper>
+

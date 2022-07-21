@@ -16,3 +16,6 @@ derby.log
 /bin/
 .mvn/wrapper/maven-wrapper.jar
 .sts4-cache/
+
+*/target
+*/*.iml
