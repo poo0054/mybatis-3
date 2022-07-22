@@ -18,7 +18,6 @@ package com.poo0054.dao;
 import com.poo0054.entity.SysUser;
 import org.apache.ibatis.annotations.Param;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 /**
@@ -44,7 +43,7 @@ public interface SysUserDao {
    * @param pageable 分页对象
    * @return 对象列表
    */
-  List<SysUser> queryAllByLimit(SysUser sysUser, @Param("pageable") Pageable pageable);
+  List<SysUser> queryAllByLimit(SysUser sysUser);
 
   /**
    * 统计总行数

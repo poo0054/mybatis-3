@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +15,6 @@
  */
 package org.apache.ibatis.builder;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import org.apache.ibatis.mapping.ParameterMode;
 import org.apache.ibatis.mapping.ResultSetType;
 import org.apache.ibatis.session.Configuration;
@@ -27,6 +22,11 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeAliasRegistry;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * @author Clinton Begin
@@ -38,7 +38,9 @@ public abstract class BaseBuilder {
 
   public BaseBuilder(Configuration configuration) {
     this.configuration = configuration;
+    //别名解析
     this.typeAliasRegistry = this.configuration.getTypeAliasRegistry();
+    //typeHandler解析
     this.typeHandlerRegistry = this.configuration.getTypeHandlerRegistry();
   }
 
@@ -146,6 +148,7 @@ public abstract class BaseBuilder {
   }
 
   protected <T> Class<? extends T> resolveAlias(String alias) {
+    //这里的typeAliasRegistry就是configuration中的
     return typeAliasRegistry.resolveAlias(alias);
   }
 }

@@ -15,14 +15,14 @@
  */
 package org.apache.ibatis.io;
 
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
 
 /**
  * <p>ResolverUtil is used to locate classes that are available in the/a class path and meet
@@ -53,9 +53,8 @@ import org.apache.ibatis.logging.LogFactory;
  * Collection&lt;ActionBean&gt; beans = resolver.getClasses();
  * </pre>
  *
+ * @param <T> the generic type
  * @author Tim Fennell
- * @param <T>
- *          the generic type
  */
 public class ResolverUtil<T> {
 
@@ -74,8 +73,7 @@ public class ResolverUtil<T> {
      * Will be called repeatedly with candidate classes. Must return True if a class
      * is to be included in the results, false otherwise.
      *
-     * @param type
-     *          the type
+     * @param type the type
      * @return true, if successful
      */
     boolean matches(Class<?> type);
@@ -87,20 +85,23 @@ public class ResolverUtil<T> {
    */
   public static class IsA implements Test {
 
-    /** The parent. */
+    /**
+     * The parent.
+     */
     private Class<?> parent;
 
     /**
      * Constructs an IsA test using the supplied Class as the parent class/interface.
      *
-     * @param parentType
-     *          the parent type
+     * @param parentType the parent type
      */
     public IsA(Class<?> parentType) {
       this.parent = parentType;
     }
 
-    /** Returns true if type is assignable to the parent type supplied in the constructor. */
+    /**
+     * Returns true if type is assignable to the parent type supplied in the constructor.
+     */
     @Override
     public boolean matches(Class<?> type) {
       return type != null && parent.isAssignableFrom(type);
@@ -118,20 +119,23 @@ public class ResolverUtil<T> {
    */
   public static class AnnotatedWith implements Test {
 
-    /** The annotation. */
+    /**
+     * The annotation.
+     */
     private Class<? extends Annotation> annotation;
 
     /**
      * Constructs an AnnotatedWith test for the specified annotation type.
      *
-     * @param annotation
-     *          the annotation
+     * @param annotation the annotation
      */
     public AnnotatedWith(Class<? extends Annotation> annotation) {
       this.annotation = annotation;
     }
 
-    /** Returns true if the type is annotated with the class provided to the constructor. */
+    /**
+     * Returns true if the type is annotated with the class provided to the constructor.
+     */
     @Override
     public boolean matches(Class<?> type) {
       return type != null && type.isAnnotationPresent(annotation);
@@ -144,6 +148,9 @@ public class ResolverUtil<T> {
   }
 
   /** The set of matches being accumulated. */
+  /**
+   * 匹配成功的类
+   */
   private Set<Class<? extends T>> matches = new HashSet<>();
 
   /**
@@ -188,10 +195,8 @@ public class ResolverUtil<T> {
    * of a non-interface class, subclasses will be collected.  Accumulated classes can be
    * accessed by calling {@link #getClasses()}.
    *
-   * @param parent
-   *          the class of interface to find subclasses or implementations of
-   * @param packageNames
-   *          one or more package names to scan (including subpackages) for classes
+   * @param parent       the class of interface to find subclasses or implementations of
+   * @param packageNames one or more package names to scan (including subpackages) for classes
    * @return the resolver util
    */
   public ResolverUtil<T> findImplementations(Class<?> parent, String... packageNames) {
@@ -211,10 +216,8 @@ public class ResolverUtil<T> {
    * Attempts to discover classes that are annotated with the annotation. Accumulated
    * classes can be accessed by calling {@link #getClasses()}.
    *
-   * @param annotation
-   *          the annotation that should be present on matching classes
-   * @param packageNames
-   *          one or more package names to scan (including subpackages) for classes
+   * @param annotation   the annotation that should be present on matching classes
+   * @param packageNames one or more package names to scan (including subpackages) for classes
    * @return the resolver util
    */
   public ResolverUtil<T> findAnnotated(Class<? extends Annotation> annotation, String... packageNames) {
@@ -236,18 +239,19 @@ public class ResolverUtil<T> {
    * true the class is retained.  Accumulated classes can be fetched by calling
    * {@link #getClasses()}.
    *
-   * @param test
-   *          an instance of {@link Test} that will be used to filter classes
-   * @param packageName
-   *          the name of the package from which to start scanning for classes, e.g. {@code net.sourceforge.stripes}
+   * @param test        an instance of {@link Test} that will be used to filter classes
+   * @param packageName the name of the package from which to start scanning for classes, e.g. {@code net.sourceforge.stripes}
    * @return the resolver util
    */
   public ResolverUtil<T> find(Test test, String packageName) {
+    //转换成文件格式
     String path = getPackagePath(packageName);
 
     try {
+      //获取所有文件
       List<String> children = VFS.getInstance().list(path);
       for (String child : children) {
+        //找出class文件
         if (child.endsWith(".class")) {
           addIfMatching(test, child);
         }
@@ -263,8 +267,7 @@ public class ResolverUtil<T> {
    * Converts a Java package name to a path that can be looked up with a call to
    * {@link ClassLoader#getResources(String)}.
    *
-   * @param packageName
-   *          The Java package name to convert to a path
+   * @param packageName The Java package name to convert to a path
    * @return the package path
    */
   protected String getPackagePath(String packageName) {
@@ -276,12 +279,13 @@ public class ResolverUtil<T> {
    * resolved classes if and only if it is approved by the Test supplied.
    *
    * @param test the test used to determine if the class matches
-   * @param fqn the fully qualified name of a class
+   * @param fqn  the fully qualified name of a class
    */
   @SuppressWarnings("unchecked")
   protected void addIfMatching(Test test, String fqn) {
     try {
       String externalName = fqn.substring(0, fqn.indexOf('.')).replace('/', '.');
+      //获取当前classLoader
       ClassLoader loader = getClassLoader();
       if (log.isDebugEnabled()) {
         log.debug("Checking to see if class " + externalName + " matches criteria [" + test + "]");
@@ -293,7 +297,7 @@ public class ResolverUtil<T> {
       }
     } catch (Throwable t) {
       log.warn("Could not examine class '" + fqn + "'" + " due to a "
-          + t.getClass().getName() + " with message: " + t.getMessage());
+        + t.getClass().getName() + " with message: " + t.getMessage());
     }
   }
 }

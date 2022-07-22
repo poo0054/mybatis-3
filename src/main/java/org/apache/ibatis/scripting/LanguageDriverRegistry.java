@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.scripting;
 
+import org.apache.ibatis.util.MapUtil;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.ibatis.util.MapUtil;
 
 /**
  * @author Frank D. Martinez [mnesarco]
@@ -26,13 +26,24 @@ import org.apache.ibatis.util.MapUtil;
 public class LanguageDriverRegistry {
 
   private final Map<Class<? extends LanguageDriver>, LanguageDriver> LANGUAGE_DRIVER_MAP = new HashMap<>();
-
+  /**
+   * 默认的预约驱动 XMLLanguageDriver
+   */
   private Class<? extends LanguageDriver> defaultDriverClass;
 
   public void register(Class<? extends LanguageDriver> cls) {
     if (cls == null) {
       throw new IllegalArgumentException("null is not a valid Language Driver");
     }
+    MapUtil.computeIfAbsent(LANGUAGE_DRIVER_MAP, cls, aClass -> {
+      try {
+        return aClass.newInstance();
+      } catch (Exception e) {
+        throw new ScriptingException("Failed to load language driver for " + cls.getName(), e);
+      }
+    });
+
+    
     MapUtil.computeIfAbsent(LANGUAGE_DRIVER_MAP, cls, k -> {
       try {
         return k.getDeclaredConstructor().newInstance();

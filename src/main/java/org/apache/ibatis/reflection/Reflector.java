@@ -15,35 +15,17 @@
  */
 package org.apache.ibatis.reflection;
 
+import org.apache.ibatis.reflection.invoker.*;
+import org.apache.ibatis.reflection.property.PropertyNamer;
+import org.apache.ibatis.util.MapUtil;
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.ReflectPermission;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-
-import org.apache.ibatis.reflection.invoker.AmbiguousMethodInvoker;
-import org.apache.ibatis.reflection.invoker.GetFieldInvoker;
-import org.apache.ibatis.reflection.invoker.Invoker;
-import org.apache.ibatis.reflection.invoker.MethodInvoker;
-import org.apache.ibatis.reflection.invoker.SetFieldInvoker;
-import org.apache.ibatis.reflection.property.PropertyNamer;
-import org.apache.ibatis.util.MapUtil;
 
 /**
  * This class represents a cached set of class definition information that
@@ -54,26 +36,58 @@ import org.apache.ibatis.util.MapUtil;
 public class Reflector {
 
   private static final MethodHandle isRecordMethodHandle = getIsRecordMethodHandle();
+  /**
+   * JavaBean 的 Class类型，在调用 Reflector 的构造方法时初始化该值
+   */
   private final Class<?> type;
+
+  /**
+   * getMethods的所有key
+   */
   private final String[] readablePropertyNames;
+  /**
+   * getMethods的所有key
+   */
   private final String[] writablePropertyNames;
+
+  /**
+   * key 属性名，value 该属性名对应的 setter方法调用器
+   */
   private final Map<String, Invoker> setMethods = new HashMap<>();
   private final Map<String, Invoker> getMethods = new HashMap<>();
+
+  /**
+   * key 属性名称，value 该属性 setter方法的返回值类型
+   */
   private final Map<String, Class<?>> setTypes = new HashMap<>();
   private final Map<String, Class<?>> getTypes = new HashMap<>();
+
+  /**
+   * type 的默认构造方法
+   */
   private Constructor<?> defaultConstructor;
 
+  /**
+   * 所有属性名称的集合
+   * key - 大写 value - 小写
+   */
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
 
   public Reflector(Class<?> clazz) {
     type = clazz;
+    //获取type构造方法
     addDefaultConstructor(clazz);
+    //获取type所有方法
     Method[] classMethods = getClassMethods(clazz);
     if (isRecord(type)) {
       addRecordGetMethods(classMethods);
     } else {
+      //添加type类中所有get方法  getMethods  getTypes
       addGetMethods(classMethods);
+      //添加type类中所有set方法  setMethods  setTypes
       addSetMethods(classMethods);
+      //添加type类中所有属性 不在set或get中就添加
+      // set -> SetFieldInvoker  get - > getFieldInvoker  调用invoke赋值
       addFields(clazz);
     }
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
@@ -92,13 +106,16 @@ public class Reflector {
   }
 
   private void addDefaultConstructor(Class<?> clazz) {
+    //获取所有构造方法
     Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+    //获取空构造
     Arrays.stream(constructors).filter(constructor -> constructor.getParameterTypes().length == 0)
       .findAny().ifPresent(constructor -> this.defaultConstructor = constructor);
   }
 
   private void addGetMethods(Method[] methods) {
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
+    //找出参数为空并且get，is方法
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
     resolveGetterConflicts(conflictingGetters);
@@ -138,10 +155,10 @@ public class Reflector {
 
   private void addGetMethod(String name, Method method, boolean isAmbiguous) {
     MethodInvoker invoker = isAmbiguous
-        ? new AmbiguousMethodInvoker(method, MessageFormat.format(
-            "Illegal overloaded getter method with ambiguous type for property ''{0}'' in class ''{1}''. This breaks the JavaBeans specification and can cause unpredictable results.",
-            name, method.getDeclaringClass().getName()))
-        : new MethodInvoker(method);
+      ? new AmbiguousMethodInvoker(method, MessageFormat.format(
+      "Illegal overloaded getter method with ambiguous type for property ''{0}'' in class ''{1}''. This breaks the JavaBeans specification and can cause unpredictable results.",
+      name, method.getDeclaringClass().getName()))
+      : new MethodInvoker(method);
     getMethods.put(name, invoker);
     Type returnType = TypeParameterResolver.resolveReturnType(method, type);
     getTypes.put(name, typeToClass(returnType));
@@ -149,6 +166,7 @@ public class Reflector {
 
   private void addSetMethods(Method[] methods) {
     Map<String, List<Method>> conflictingSetters = new HashMap<>();
+    //获取所有空参方法 get,is方法
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 1 && PropertyNamer.isSetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingSetters, PropertyNamer.methodToProperty(m.getName()), m));
     resolveSetterConflicts(conflictingSetters);
@@ -198,9 +216,9 @@ public class Reflector {
       return setter1;
     }
     MethodInvoker invoker = new AmbiguousMethodInvoker(setter1,
-        MessageFormat.format(
-            "Ambiguous setters defined for property ''{0}'' in class ''{1}'' with types ''{2}'' and ''{3}''.",
-            property, setter2.getDeclaringClass().getName(), paramType1.getName(), paramType2.getName()));
+      MessageFormat.format(
+        "Ambiguous setters defined for property ''{0}'' in class ''{1}'' with types ''{2}'' and ''{3}''.",
+        property, setter2.getDeclaringClass().getName(), paramType1.getName(), paramType2.getName()));
     setMethods.put(property, invoker);
     Type[] paramTypes = TypeParameterResolver.resolveParamTypes(setter1, type);
     setTypes.put(property, typeToClass(paramTypes[0]));
@@ -464,7 +482,7 @@ public class Reflector {
    */
   private static boolean isRecord(Class<?> clazz) {
     try {
-      return isRecordMethodHandle != null && (boolean)isRecordMethodHandle.invokeExact(clazz);
+      return isRecordMethodHandle != null && (boolean) isRecordMethodHandle.invokeExact(clazz);
     } catch (Throwable e) {
       throw new ReflectionException("Failed to invoke 'Class.isRecord()'.", e);
     }

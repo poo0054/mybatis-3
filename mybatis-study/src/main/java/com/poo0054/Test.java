@@ -17,6 +17,7 @@ package com.poo0054;
 
 import com.poo0054.dao.SysUserDao;
 import com.poo0054.entity.SysUser;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -24,24 +25,45 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author ZhangZhi
  * @version 1.0
  * @since 2022/7/15 15:46
  */
+@Slf4j
 public class Test {
 
-  public static void main(String[] args) throws IOException {
-    String resource = "mybatis-config.xml";
-    InputStream inputStream = Resources.getResourceAsStream(resource);
-    SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      SysUserDao roleMapper = sqlSession.getMapper(SysUserDao.class);
-      SysUser sysUser = roleMapper.queryById(1L);
-      System.out.println(sysUser);
-    }
-
+  @org.junit.Test
+  public void test() throws IOException {
+    exec();
   }
+
+  /**
+   * mybatis 初始化
+   */
+  private static void exec() {
+    String resource = "mybatis-config.xml";
+    //使用ClassLoader获得当前项目路径
+    InputStream inputStream = null;
+    try {
+      inputStream = Resources.getResourceAsStream(resource);
+      //获取DefaultSqlSessionFactory对象
+      SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+      //使用另外一套数据源
+//    SqlSessionFactory testSessionFactory = new SqlSessionFactoryBuilder().build(inputStream, "test");
+
+      //每次都是一个新的sqlSession
+      try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+        SysUserDao roleMapper = sqlSession.getMapper(SysUserDao.class);
+        List<SysUser> sysUser = roleMapper.queryAllByLimit(new SysUser());
+        log.debug(sysUser.toString());
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
 }

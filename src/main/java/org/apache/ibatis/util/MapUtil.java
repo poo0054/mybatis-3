@@ -24,6 +24,9 @@ public class MapUtil {
   /**
    * A temporary workaround for Java 8 specific performance issue JDK-8161372 .<br>
    * This class should be removed once we drop Java 8 support.
+   * 针对 Java 8 特定性能问题 JDK-8161372 的临时解决方法。<br> 一旦我们放弃对 Java 8 的支持，就应该删除这个类。
+   * <p>
+   * map中的key不为空直接返回，为空就调用computeIfAbsent方法 ——> key不存在 就调用Function并且不为空就添加入map
    *
    * @see <a href="https://bugs.openjdk.java.net/browse/JDK-8161372">https://bugs.openjdk.java.net/browse/JDK-8161372</a>
    */
