@@ -46,14 +46,19 @@ public class Test {
   private static void exec() {
     String resource = "mybatis-config.xml";
     //使用ClassLoader获得当前项目路径
-    InputStream inputStream = null;
     try {
-      inputStream = Resources.getResourceAsStream(resource);
+      InputStream inputStream = Resources.getResourceAsStream(resource);
       //获取DefaultSqlSessionFactory对象
       SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 
       //使用另外一套数据源
-//    SqlSessionFactory testSessionFactory = new SqlSessionFactoryBuilder().build(inputStream, "test");
+      InputStream resourceAsStream = Resources.getResourceAsStream(resource);
+      SqlSessionFactory testSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream, "test");
+      SqlSession sqlSession1 = testSessionFactory.openSession();
+      SysUserDao sysUserDao = sqlSession1.getMapper(SysUserDao.class);
+      List<SysUser> sysUsers = sysUserDao.queryAllByLimit(new SysUser());
+      log.debug(sysUsers.toString());
+
 
       //每次都是一个新的sqlSession
       try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
