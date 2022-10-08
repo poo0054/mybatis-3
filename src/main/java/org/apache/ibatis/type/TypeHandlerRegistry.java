@@ -39,12 +39,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class TypeHandlerRegistry {
 
-  private final Map<JdbcType, TypeHandler<?>> jdbcTypeHandlerMap = new EnumMap<>(JdbcType.class);
   /**
-   *
+   * 该集合主要用于从结果集读取数据时，将数据从 JDBC类型 转换成 Java类型
+   */
+  private final Map<JdbcType, TypeHandler<?>> jdbcTypeHandlerMap = new EnumMap<>(JdbcType.class);
+
+  /**
+   * 记录了 Java类型 向指定 JdbcType 转换时，需要使用的 TypeHandler对象。
+   * 如：String 可能转换成数据库的 char、varchar 等多种类型，所以存在一对多的关系
    */
   private final Map<Type, Map<JdbcType, TypeHandler<?>>> typeHandlerMap = new ConcurrentHashMap<>();
   private final TypeHandler<Object> unknownTypeHandler;
+
+  /**
+   * key：TypeHandler 的类型；value：该 TypeHandler类型 对应的 TypeHandler对象
+   */
   private final Map<Class<?>, TypeHandler<?>> allTypeHandlersMap = new HashMap<>();
 
   private static final Map<JdbcType, TypeHandler<?>> NULL_TYPE_HANDLER_MAP = Collections.emptyMap();
@@ -170,6 +179,7 @@ public final class TypeHandlerRegistry {
   /**
    * Set a default {@link TypeHandler} class for {@link Enum}.
    * A default {@link TypeHandler} is {@link org.apache.ibatis.type.EnumTypeHandler}.
+   *
    * @param typeHandler a type handler class for {@link Enum}
    * @since 3.4.5
    */
@@ -376,6 +386,10 @@ public final class TypeHandlerRegistry {
     register((Type) type, jdbcType, handler);
   }
 
+  /**
+   * TypeHandlerRegistry 中对 register()方法 实现了多种重载，本 register()方法
+   * 被很多重载方法调用，用来完成注册功能。
+   */
   private void register(Type javaType, JdbcType jdbcType, TypeHandler<?> handler) {
     if (javaType != null) {
       Map<JdbcType, TypeHandler<?>> map = typeHandlerMap.get(javaType);

@@ -105,6 +105,24 @@ public class XMLConfigBuilder extends BaseBuilder {
     return configuration;
   }
 
+  private Properties settingsAsProperties(XNode context) {
+    if (context == null) {
+      return new Properties();
+    }
+    Properties props = context.getChildrenAsProperties();
+    // Check that all settings are known to the configuration class
+    //检查配置类是否知道所有设置
+    //检查该类是否存在配置中属性
+    MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
+    for (Object key : props.keySet()) {
+      //使用set方法进行判断
+      if (!metaConfig.hasSetter(String.valueOf(key))) {
+        throw new BuilderException("The setting " + key + " is not known.  Make sure you spelled it correctly (case sensitive).");
+      }
+    }
+    return props;
+  }
+
   /**
    * 解析configuration中内容
    *
@@ -144,24 +162,6 @@ public class XMLConfigBuilder extends BaseBuilder {
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
     }
-  }
-
-  private Properties settingsAsProperties(XNode context) {
-    if (context == null) {
-      return new Properties();
-    }
-    Properties props = context.getChildrenAsProperties();
-    // Check that all settings are known to the configuration class
-    //检查配置类是否知道所有设置
-    //检查该类是否存在配置中属性
-    MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
-    for (Object key : props.keySet()) {
-      //使用set方法进行判断
-      if (!metaConfig.hasSetter(String.valueOf(key))) {
-        throw new BuilderException("The setting " + key + " is not known.  Make sure you spelled it correctly (case sensitive).");
-      }
-    }
-    return props;
   }
 
   private void loadCustomVfs(Properties props) throws ClassNotFoundException {

@@ -25,21 +25,24 @@ import java.sql.SQLException;
  */
 public interface TypeHandler<T> {
 
+  /**
+   * 通过 PreparedStatement 为 SQL语句 绑定参数时，将数据从 Java类型 转换为 JDBC类型
+   */
   void setParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException;
 
   /**
    * Gets the result.
    *
-   * @param rs
-   *          the rs
-   * @param columnName
-   *          Column name, when configuration <code>useColumnLabel</code> is <code>false</code>
+   * @param rs         the rs
+   * @param columnName Column name, when configuration <code>useColumnLabel</code> is <code>false</code>
    * @return the result
-   * @throws SQLException
-   *           the SQL exception
+   * @throws SQLException the SQL exception
    */
   T getResult(ResultSet rs, String columnName) throws SQLException;
 
+  /**
+   * 从结果集获取数据时，将数据由 JDBC类型 转换成 Java类型
+   */
   T getResult(ResultSet rs, int columnIndex) throws SQLException;
 
   T getResult(CallableStatement cs, int columnIndex) throws SQLException;
