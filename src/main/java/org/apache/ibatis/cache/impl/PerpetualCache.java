@@ -15,19 +15,24 @@
  */
 package org.apache.ibatis.cache.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Clinton Begin
  */
 public class PerpetualCache implements Cache {
-
+  /**
+   * Cache对象 的唯一标识
+   */
   private final String id;
 
+  /**
+   * 其所有的缓存功能实现，都是基于 JDK 的 HashMap 提供的方法
+   */
   private final Map<Object, Object> cache = new HashMap<>();
 
   public PerpetualCache(String id) {
@@ -64,6 +69,9 @@ public class PerpetualCache implements Cache {
     cache.clear();
   }
 
+  /**
+   * 其重写了 Object 中的 equals() 和 hashCode()方法，两者都只关心 id字段
+   */
   @Override
   public boolean equals(Object o) {
     if (getId() == null) {
