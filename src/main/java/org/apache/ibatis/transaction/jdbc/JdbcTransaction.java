@@ -15,16 +15,15 @@
  */
 package org.apache.ibatis.transaction.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionException;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * {@link Transaction} that makes use of the JDBC commit and rollback facilities directly.
@@ -33,16 +32,20 @@ import org.apache.ibatis.transaction.TransactionException;
  * Ignores commit or rollback requests when autocommit is on.
  *
  * @author Clinton Begin
- *
  * @see JdbcTransactionFactory
  */
 public class JdbcTransaction implements Transaction {
 
   private static final Log log = LogFactory.getLog(JdbcTransaction.class);
-
   protected Connection connection;
   protected DataSource dataSource;
+  /**
+   * 事务隔离级别
+   */
   protected TransactionIsolationLevel level;
+  /**
+   * 是否自动提交
+   */
   protected boolean autoCommit;
   protected boolean skipSetAutoCommitOnClose;
 
@@ -112,8 +115,8 @@ public class JdbcTransaction implements Transaction {
       // Only a very poorly implemented driver would fail here,
       // and there's not much we can do about that.
       throw new TransactionException("Error configuring AutoCommit.  "
-          + "Your driver may not support getAutoCommit() or setAutoCommit(). "
-          + "Requested setting: " + desiredAutoCommit + ".  Cause: " + e, e);
+        + "Your driver may not support getAutoCommit() or setAutoCommit(). "
+        + "Requested setting: " + desiredAutoCommit + ".  Cause: " + e, e);
     }
   }
 
@@ -133,7 +136,7 @@ public class JdbcTransaction implements Transaction {
     } catch (SQLException e) {
       if (log.isDebugEnabled()) {
         log.debug("Error resetting autocommit to true "
-            + "before closing the connection.  Cause: " + e);
+          + "before closing the connection.  Cause: " + e);
       }
     }
   }

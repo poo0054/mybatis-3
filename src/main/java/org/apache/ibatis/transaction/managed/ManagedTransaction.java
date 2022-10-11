@@ -15,15 +15,14 @@
  */
 package org.apache.ibatis.transaction.managed;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * {@link Transaction} that lets the container manage the full lifecycle of the transaction.
@@ -32,7 +31,6 @@ import org.apache.ibatis.transaction.Transaction;
  * By default, it closes the connection but can be configured not to do it.
  *
  * @author Clinton Begin
- *
  * @see ManagedTransactionFactory
  */
 public class ManagedTransaction implements Transaction {
@@ -42,6 +40,9 @@ public class ManagedTransaction implements Transaction {
   private DataSource dataSource;
   private TransactionIsolationLevel level;
   private Connection connection;
+  /**
+   * 控制是否关闭持有的连接，在 close()方法 中用其判断是否真的关闭连接
+   */
   private final boolean closeConnection;
 
   public ManagedTransaction(Connection connection, boolean closeConnection) {
