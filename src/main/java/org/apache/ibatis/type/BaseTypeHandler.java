@@ -15,20 +15,22 @@
  */
 package org.apache.ibatis.type;
 
+import org.apache.ibatis.executor.result.ResultMapException;
+import org.apache.ibatis.session.Configuration;
+
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.ibatis.executor.result.ResultMapException;
-import org.apache.ibatis.session.Configuration;
-
 /**
  * The base {@link TypeHandler} for references a generic type.
+ * TypeHandler引用泛型类型。
  * <p>
  * Important: Since 3.5.0, This class never call the {@link ResultSet#wasNull()} and
  * {@link CallableStatement#wasNull()} method for handling the SQL {@code NULL} value.
  * In other words, {@code null} value handling should be performed on subclass.
+ * 重要提示：从3.5.0开始，此类从不调用ResultSet。wasNull（）和CallableStatement。用于处理SQL NULL值的wasNull（）方法。换句话说，应该对子类执行空值处理。
  * </p>
  *
  * @author Clinton Begin
@@ -46,8 +48,7 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
   /**
    * Sets the configuration.
    *
-   * @param c
-   *          the new configuration
+   * @param c the new configuration
    * @deprecated Since 3.5.0 - See https://github.com/mybatis/mybatis-3/issues/1203. This property will remove future.
    */
   @Deprecated
@@ -55,6 +56,9 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
     this.configuration = c;
   }
 
+  /**
+   * 只是处理了一些数据为空的特殊情况，非空数据的处理都交给子类去处理
+   */
   @Override
   public void setParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException {
     if (parameter == null) {
@@ -65,16 +69,16 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
         ps.setNull(i, jdbcType.TYPE_CODE);
       } catch (SQLException e) {
         throw new TypeException("Error setting null for parameter #" + i + " with JdbcType " + jdbcType + " . "
-              + "Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. "
-              + "Cause: " + e, e);
+          + "Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. "
+          + "Cause: " + e, e);
       }
     } else {
       try {
         setNonNullParameter(ps, i, parameter, jdbcType);
       } catch (Exception e) {
         throw new TypeException("Error setting non null for parameter #" + i + " with JdbcType " + jdbcType + " . "
-              + "Try setting a different JdbcType for this parameter or a different configuration property. "
-              + "Cause: " + e, e);
+          + "Try setting a different JdbcType for this parameter or a different configuration property. "
+          + "Cause: " + e, e);
       }
     }
   }
@@ -111,13 +115,10 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
   /**
    * Gets the nullable result.
    *
-   * @param rs
-   *          the rs
-   * @param columnName
-   *          Column name, when configuration <code>useColumnLabel</code> is <code>false</code>
+   * @param rs         the rs
+   * @param columnName Column name, when configuration <code>useColumnLabel</code> is <code>false</code>
    * @return the nullable result
-   * @throws SQLException
-   *           the SQL exception
+   * @throws SQLException the SQL exception
    */
   public abstract T getNullableResult(ResultSet rs, String columnName) throws SQLException;
 

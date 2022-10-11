@@ -21,6 +21,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
+ * TypeHandler 是 Mybatis 中所有类型转换器的顶层接口，
+ * 主要用于实现数据从 Java 类型 到 JdbcType 类型 的相互转换。
+ *
  * @author Clinton Begin
  */
 public interface TypeHandler<T> {
@@ -32,6 +35,8 @@ public interface TypeHandler<T> {
 
   /**
    * Gets the result.
+   * <p>
+   * 从结果集获取数据时，将数据由 JDBC类型 转换成 Java类型
    *
    * @param rs         the rs
    * @param columnName Column name, when configuration <code>useColumnLabel</code> is <code>false</code>

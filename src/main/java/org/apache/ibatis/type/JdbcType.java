@@ -26,6 +26,8 @@ public enum JdbcType {
   /*
    * This is added to enable basic support for the
    * ARRAY data type - but a custom type handler is still required
+   * 添加此选项是为了启用对
+   * ARRAY数据类型-但仍需要自定义类型处理程序
    */
   ARRAY(Types.ARRAY),
   BIT(Types.BIT),
@@ -70,7 +72,11 @@ public enum JdbcType {
   TIMESTAMP_WITH_TIMEZONE(Types.TIMESTAMP_WITH_TIMEZONE); // JDBC 4.2 JDK8
 
   public final int TYPE_CODE;
-  private static Map<Integer,JdbcType> codeLookup = new HashMap<>();
+
+  /**
+   * 该静态集合维护了 常量编码 与  JdbcType 之间的关系
+   */
+  private static Map<Integer, JdbcType> codeLookup = new HashMap<>();
 
   static {
     for (JdbcType type : JdbcType.values()) {
@@ -82,7 +88,7 @@ public enum JdbcType {
     this.TYPE_CODE = code;
   }
 
-  public static JdbcType forCode(int code)  {
+  public static JdbcType forCode(int code) {
     return codeLookup.get(code);
   }
 

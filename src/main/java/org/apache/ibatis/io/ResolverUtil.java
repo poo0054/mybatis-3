@@ -66,6 +66,7 @@ public class ResolverUtil<T> {
   /**
    * A simple interface that specifies how to test classes to determine if they
    * are to be included in the results produced by the ResolverUtil.
+   * 一个简单的接口，指定如何测试类以确定它们是否包含在ResolverUtil生成的结果中。
    */
   public interface Test {
 
@@ -238,13 +239,15 @@ public class ResolverUtil<T> {
    * Each class is offered up to the Test as it is discovered, and if the Test returns
    * true the class is retained.  Accumulated classes can be fetched by calling
    * {@link #getClasses()}.
+   * <p>
+   * 从提供的包开始，向下扫描到子包中的类。每个类都会在发现时提供给Test，如果Test返回true，则会保留该类。可以通过调用getClasses（）来获取累积的类。
    *
    * @param test        an instance of {@link Test} that will be used to filter classes
    * @param packageName the name of the package from which to start scanning for classes, e.g. {@code net.sourceforge.stripes}
    * @return the resolver util
    */
   public ResolverUtil<T> find(Test test, String packageName) {
-    //转换成文件格式
+    //转换成文件格式  .转换为/
     String path = getPackagePath(packageName);
 
     try {
@@ -266,6 +269,8 @@ public class ResolverUtil<T> {
   /**
    * Converts a Java package name to a path that can be looked up with a call to
    * {@link ClassLoader#getResources(String)}.
+   * <p>
+   * 将Java包名称转换为可以通过调用ClassLoader.getResources（String）查找的路径。
    *
    * @param packageName The Java package name to convert to a path
    * @return the package path
@@ -277,6 +282,7 @@ public class ResolverUtil<T> {
   /**
    * Add the class designated by the fully qualified class name provided to the set of
    * resolved classes if and only if it is approved by the Test supplied.
+   * 如果且仅当所提供的测试批准时，将由所提供的完全限定类名指定的类添加到已解析类集。
    *
    * @param test the test used to determine if the class matches
    * @param fqn  the fully qualified name of a class
@@ -292,6 +298,7 @@ public class ResolverUtil<T> {
       }
 
       Class<?> type = loader.loadClass(externalName);
+      //是否为test.parent的类型
       if (test.matches(type)) {
         matches.add((Class<T>) type);
       }

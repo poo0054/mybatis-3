@@ -34,6 +34,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * TypeHandlerRegistry 主要负责管理所有已知的 TypeHandler，Mybatis 在初始化过程中会为所有已知的 TypeHandler 创建对象，并注册到 TypeHandlerRegistry。
+ *
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
@@ -49,6 +51,7 @@ public final class TypeHandlerRegistry {
    * 如：String 可能转换成数据库的 char、varchar 等多种类型，所以存在一对多的关系
    */
   private final Map<Type, Map<JdbcType, TypeHandler<?>>> typeHandlerMap = new ConcurrentHashMap<>();
+
   private final TypeHandler<Object> unknownTypeHandler;
 
   /**
@@ -227,11 +230,18 @@ public final class TypeHandlerRegistry {
     return getTypeHandler(javaTypeReference.getRawType(), jdbcType);
   }
 
+  /**
+   * 获取 TypeHandler对象
+   * getTypeHandler()方法 亦存在多种重载，而本重载方法被其它多个重载方法调用
+   */
   @SuppressWarnings("unchecked")
   private <T> TypeHandler<T> getTypeHandler(Type type, JdbcType jdbcType) {
     if (ParamMap.class.equals(type)) {
       return null;
     }
+    // Java数据类型 与 JDBC数据类型 的关系往往是一对多，
+    // 所以一般会先根据 Java数据类型 获取 Map<JdbcType, TypeHandler<?>>对象
+    // 再根据 JDBC数据类型 获取对应的 TypeHandler对象
     Map<JdbcType, TypeHandler<?>> jdbcHandlerMap = getJdbcHandlerMap(type);
     TypeHandler<?> handler = null;
     if (jdbcHandlerMap != null) {
@@ -462,12 +472,18 @@ public final class TypeHandlerRegistry {
 
   // scan
 
+  /**
+   * 从指定 包名packageName 中获取自定义的 TypeHandler实现类
+   */
   public void register(String packageName) {
     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
+    //找出所有与TypeHandler有关的类
     resolverUtil.find(new ResolverUtil.IsA(TypeHandler.class), packageName);
     Set<Class<? extends Class<?>>> handlerSet = resolverUtil.getClasses();
+    //注册所有类
     for (Class<?> type : handlerSet) {
       //Ignore inner classes and interfaces (including package-info.java) and abstract classes
+      //忽略内部类和接口（包括package-info.java）以及抽象类
       if (!type.isAnonymousClass() && !type.isInterface() && !Modifier.isAbstract(type.getModifiers())) {
         register(type);
       }
