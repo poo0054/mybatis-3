@@ -15,12 +15,11 @@
  */
 package org.apache.ibatis.datasource.unpooled;
 
+import org.apache.ibatis.io.Resources;
+
+import javax.sql.DataSource;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -28,29 +27,56 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import javax.sql.DataSource;
-
-import org.apache.ibatis.io.Resources;
-
 /**
+ * 本实现类实现了 DataSource 接口 中的 getConnection() 及其重载方法，用于获取数据库连接。
+ *
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
 public class UnpooledDataSource implements DataSource {
 
+  /**
+   * 加载 Driver驱动类 的类加载器
+   */
   private ClassLoader driverClassLoader;
+  /**
+   * 数据库连接驱动的相关配置，通过 UnpooledDataSourceFactory 的 setProperties()方法 设置进来的
+   */
   private Properties driverProperties;
+  /**
+   * 缓存所有已注册的 数据库连接驱动Driver
+   */
   private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<>();
 
+  /**
+   * 数据库连接驱动名称
+   */
   private String driver;
+  /**
+   * 数据库url
+   */
   private String url;
   private String username;
   private String password;
 
+  /**
+   * 是否自动提交事务
+   */
   private Boolean autoCommit;
+  /**
+   * 默认的事务隔离级别
+   */
   private Integer defaultTransactionIsolationLevel;
+  /**
+   * 默认的网络连接超时时间
+   */
   private Integer defaultNetworkTimeout;
 
+
+  /**
+   * UnpooledDataSource 被加载时，会通过该静态代码块将已经在 DriverManager
+   * 中注册的 JDBC Driver 注册到 registeredDrivers 中
+   */
   static {
     Enumeration<Driver> drivers = DriverManager.getDrivers();
     while (drivers.hasMoreElements()) {
@@ -197,13 +223,13 @@ public class UnpooledDataSource implements DataSource {
   /**
    * Sets the default network timeout value to wait for the database operation to complete. See {@link Connection#setNetworkTimeout(java.util.concurrent.Executor, int)}
    *
-   * @param defaultNetworkTimeout
-   *          The time in milliseconds to wait for the database operation to complete.
+   * @param defaultNetworkTimeout The time in milliseconds to wait for the database operation to complete.
    * @since 3.5.2
    */
   public void setDefaultNetworkTimeout(Integer defaultNetworkTimeout) {
     this.defaultNetworkTimeout = defaultNetworkTimeout;
   }
+
 
   private Connection doGetConnection(String username, String password) throws SQLException {
     Properties props = new Properties();
@@ -219,26 +245,43 @@ public class UnpooledDataSource implements DataSource {
     return doGetConnection(props);
   }
 
+  /**
+   * getConnection都会调用该方法
+   *
+   * @param properties 属性对象
+   * @return 链接
+   * @throws SQLException
+   */
   private Connection doGetConnection(Properties properties) throws SQLException {
+    // 初始化数据库驱动，该方法会创建配置中指定的 Driver对象，
+    // 并将其注册到 DriverManager 和 registeredDrivers 中
     initializeDriver();
     Connection connection = DriverManager.getConnection(url, properties);
+    // 配置数据库连接属性，如：连接超时时间、是否自动提交事务、事务隔离级别
     configureConnection(connection);
     return connection;
   }
 
   private synchronized void initializeDriver() throws SQLException {
+    // 判断驱动是否已注册
     if (!registeredDrivers.containsKey(driver)) {
       Class<?> driverType;
       try {
         if (driverClassLoader != null) {
+          // 注册驱动
           driverType = Class.forName(driver, true, driverClassLoader);
         } else {
           driverType = Resources.classForName(driver);
         }
         // DriverManager requires the driver to be loaded via the system ClassLoader.
+        //DriverManager要求通过系统ClassLoader加载驱动程序。
         // http://www.kfu.com/~nsayer/Java/dyn-jdbc.html
+        //DriverManager要求通过系统ClassLoader加载驱动程序。
         Driver driverInstance = (Driver) driverType.getDeclaredConstructor().newInstance();
+        // 注册驱动到 DriverManager，DriverProxy 是 UnpooledDataSource 的内部类
+        // 也是 Driver 的静态代理类
         DriverManager.registerDriver(new DriverProxy(driverInstance));
+        // 将 driver 缓存到 registeredDrivers
         registeredDrivers.put(driver, driverInstance);
       } catch (Exception e) {
         throw new SQLException("Error setting driver on UnpooledDataSource. Cause: " + e);
@@ -247,12 +290,15 @@ public class UnpooledDataSource implements DataSource {
   }
 
   private void configureConnection(Connection conn) throws SQLException {
+    // 连接超时时间
     if (defaultNetworkTimeout != null) {
       conn.setNetworkTimeout(Executors.newSingleThreadExecutor(), defaultNetworkTimeout);
     }
+    // 是否自动提交事务
     if (autoCommit != null && autoCommit != conn.getAutoCommit()) {
       conn.setAutoCommit(autoCommit);
     }
+    // 事务隔离级别
     if (defaultTransactionIsolationLevel != null) {
       conn.setTransactionIsolation(defaultTransactionIsolationLevel);
     }

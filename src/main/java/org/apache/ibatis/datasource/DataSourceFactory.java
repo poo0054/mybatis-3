@@ -15,17 +15,28 @@
  */
 package org.apache.ibatis.datasource;
 
+import javax.sql.DataSource;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 /**
+ * DataSourceFactory 作为顶级接口
+ *
  * @author Clinton Begin
  */
 public interface DataSourceFactory {
 
+  /**
+   * 设置 DataSource 的属性，一般紧跟在 DataSource 初始化之后
+   *
+   * @param props 属性
+   */
   void setProperties(Properties props);
 
+  /**
+   * 获取 DataSource对象
+   *
+   * @return DataSource
+   */
   DataSource getDataSource();
 
 }

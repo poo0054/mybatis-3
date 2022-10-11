@@ -51,13 +51,13 @@ public class Test {
       //获取DefaultSqlSessionFactory对象
       SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 
-      //使用另外一套数据源
+      /*//使用另外一套数据源
       InputStream resourceAsStream = Resources.getResourceAsStream(resource);
       SqlSessionFactory testSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream, "test");
       SqlSession sqlSession1 = testSessionFactory.openSession();
       SysUserDao sysUserDao = sqlSession1.getMapper(SysUserDao.class);
       List<SysUser> sysUsers = sysUserDao.queryAllByLimit(new SysUser());
-      log.debug(sysUsers.toString());
+      log.debug(sysUsers.toString());*/
 
 
       //每次都是一个新的sqlSession
