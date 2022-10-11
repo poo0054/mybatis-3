@@ -21,5 +21,11 @@ public interface ReflectorFactory {
 
   void setClassCacheEnabled(boolean classCacheEnabled);
 
+  /**
+   * 通过 JavaBean 的 clazz 获取该 JavaBean 对应的 Reflector
+   *
+   * @param type
+   * @return
+   */
   Reflector findForClass(Class<?> type);
 }

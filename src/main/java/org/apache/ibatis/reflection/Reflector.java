@@ -30,6 +30,8 @@ import java.util.Map.Entry;
 /**
  * This class represents a cached set of class definition information that
  * allows for easy mapping between property names and getter/setter methods.
+ * <p>
+ * Reflector 类 主要实现了对 JavaBean 的元数据属性的封装，比如：可读属性列表，可写属性列表；及反射操作的封装，如：属性对应的 setter 方法，getter 方法 的反射调用。
  *
  * @author Clinton Begin
  */
@@ -52,14 +54,19 @@ public class Reflector {
 
   /**
    * key 属性名，value 该属性名对应的 setter方法调用器
+   *
+   * @see {@link Invoker#invoke(Object, Object[])} 的具体实现简化set和get操作
    */
   private final Map<String, Invoker> setMethods = new HashMap<>();
   private final Map<String, Invoker> getMethods = new HashMap<>();
 
   /**
-   * key 属性名称，value 该属性 setter方法的返回值类型
+   * key 属性名称 value set的type
    */
   private final Map<String, Class<?>> setTypes = new HashMap<>();
+  /**
+   * key 属性名称 value get的type
+   */
   private final Map<String, Class<?>> getTypes = new HashMap<>();
 
   /**
@@ -73,11 +80,17 @@ public class Reflector {
    */
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
 
+
+  /**
+   * 里面的大部分方法都是通过简单的 JDK反射操作 实现的
+   *
+   * @param clazz JavaBean 的 Class类型
+   */
   public Reflector(Class<?> clazz) {
     type = clazz;
     //获取type构造方法
     addDefaultConstructor(clazz);
-    //获取type所有方法
+    //获取type所有方法 包括父类 接口方法
     Method[] classMethods = getClassMethods(clazz);
     if (isRecord(type)) {
       addRecordGetMethods(classMethods);
@@ -90,8 +103,12 @@ public class Reflector {
       // set -> SetFieldInvoker  get - > getFieldInvoker  调用invoke赋值
       addFields(clazz);
     }
+
+    // 根据 getMethods、setMethods集合 初始化可读、可写的属性
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
     writablePropertyNames = setMethods.keySet().toArray(new String[0]);
+
+    // 初始化 caseInsensitivePropertyMap集合，key 属性名的大写，value 属性名
     for (String propName : readablePropertyNames) {
       caseInsensitivePropertyMap.put(propName.toUpperCase(Locale.ENGLISH), propName);
     }
@@ -115,7 +132,7 @@ public class Reflector {
 
   private void addGetMethods(Method[] methods) {
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
-    //找出参数为空并且get，is方法
+    //找出参数为空并且get，is方法  get方法
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
     resolveGetterConflicts(conflictingGetters);
@@ -311,8 +328,14 @@ public class Reflector {
 
       // we also need to look for interface methods -
       // because the class may be abstract
+      /*
+        我们还需要寻找接口方法-
+        因为这个类可能是抽象的
+       */
+
       Class<?>[] interfaces = currentClass.getInterfaces();
       for (Class<?> anInterface : interfaces) {
+        //添加抽象类（接口）的方法
         addUniqueMethods(uniqueMethods, anInterface.getMethods());
       }
 
@@ -331,6 +354,11 @@ public class Reflector {
         // check to see if the method is already known
         // if it is known, then an extended class must have
         // overridden a method
+        /*
+        检查方法是否已知
+        如果已知，则扩展类必须具有
+        重写了一个方法
+         */
         if (!uniqueMethods.containsKey(signature)) {
           uniqueMethods.put(signature, currentMethod);
         }
