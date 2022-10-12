@@ -99,6 +99,10 @@ public class TypeAliasRegistry {
     registerAlias("ResultSet", ResultSet.class);
   }
 
+  public void registerAliases(String packageName) {
+    registerAliases(packageName, Object.class);
+  }
+
   @SuppressWarnings("unchecked")
   // throws class cast exception as well if types cannot be assigned
   public <T> Class<T> resolveAlias(String string) {
@@ -118,10 +122,6 @@ public class TypeAliasRegistry {
     } catch (ClassNotFoundException e) {
       throw new TypeException("Could not resolve type alias '" + string + "'.  Cause: " + e, e);
     }
-  }
-
-  public void registerAliases(String packageName) {
-    registerAliases(packageName, Object.class);
   }
 
   public void registerAliases(String packageName, Class<?> superType) {

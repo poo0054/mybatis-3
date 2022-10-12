@@ -213,7 +213,9 @@ public class Configuration {
    * 密钥生成器集合
    */
   protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
-
+  /**
+   * 记录了已经加载过的映射文件
+   */
   protected final Set<String> loadedResources = new HashSet<>();
   /**
    * 从以前的映射器解析的 XML 片段

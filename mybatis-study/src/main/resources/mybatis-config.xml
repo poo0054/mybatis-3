@@ -117,11 +117,11 @@
   </objectFactory>
 
   <!-- mybatis-config.xml -->
- <!-- <plugins>
-    <plugin interceptor="com.poo0054.example.ExamplePlugin">
-      <property name="someProperty" value="100"/>
-    </plugin>
-  </plugins>-->
+  <!-- <plugins>
+     <plugin interceptor="com.poo0054.example.ExamplePlugin">
+       <property name="someProperty" value="100"/>
+     </plugin>
+   </plugins>-->
 
   <environments default="development">
     <environment id="development">
