@@ -15,10 +15,6 @@
  */
 package org.apache.ibatis.scripting.defaults;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -32,16 +28,31 @@ import org.apache.ibatis.type.TypeException;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+
 /**
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
 public class DefaultParameterHandler implements ParameterHandler {
 
+  /**
+   * 管理mybatis中所有的TypeHandler对象
+   */
   private final TypeHandlerRegistry typeHandlerRegistry;
-
+  /**
+   * 其中记录了SQL节点相应的配置信息
+   */
   private final MappedStatement mappedStatement;
+  /**
+   * 用户传入的实参对象
+   */
   private final Object parameterObject;
+  /**
+   * 其中记录了要执行的SQL语句，及参数信息
+   */
   private final BoundSql boundSql;
   private final Configuration configuration;
 
@@ -58,6 +69,9 @@ public class DefaultParameterHandler implements ParameterHandler {
     return parameterObject;
   }
 
+  /**
+   * 为PreparedStatement对象要执行的SQL语句中的占位符 设置对应的参数值
+   */
   @Override
   public void setParameters(PreparedStatement ps) {
     ErrorContext.instance().activity("setting parameters").object(mappedStatement.getParameterMap().getId());
