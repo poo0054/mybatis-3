@@ -9,6 +9,8 @@ import java.sql.*;
  */
 public class JdbcExec {
   public static void main(String[] args) throws ClassNotFoundException, SQLException {
+    //使用类加载注册Driver
+//    DriverManager.registerDriver(new Driver());
     Class.forName("com.mysql.cj.jdbc.Driver");
 
     Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.56.10:3306/yidian_oms", "root", "root");
