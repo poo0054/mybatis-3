@@ -274,12 +274,19 @@ public class MapperMethod {
      */
     private final SqlCommandType type;
 
+    /**
+     * 根据传递的参数 设置sql的一些属性 , sql id , type .
+     *
+     * @param configuration
+     * @param mapperInterface
+     * @param method
+     */
     public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {
       // 方法名
       final String methodName = method.getName();
       // 该方法对应的类的 Class对象
       final Class<?> declaringClass = method.getDeclaringClass();
-      // MappedStatement 封装了 sql语句 相关的信息，在 Mybatis初始化 时创建
+      // MappedStatement 封装了 sql语句 相关的信息，在 Mybatis初始化 时创建  // Statement 实质是sql
       MappedStatement ms = resolveMappedStatement(mapperInterface, methodName, declaringClass, configuration);
       if (ms == null) {
         // 处理 Flush注解
