@@ -1,4 +1,4 @@
-package com.poo0054;
+package com.poo0054.jdbc;
 
 import java.sql.*;
 

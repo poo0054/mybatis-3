@@ -13,15 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.poo0054;
+package org.apache.ibatis.session;
 
 import com.poo0054.dao.SysUserDao;
 import com.poo0054.entity.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,20 +30,14 @@ import java.util.List;
 /**
  * @author ZhangZhi
  * @version 1.0
- * @since 2022/7/15 15:46
+ * @date 2022/10/13 15:08
  */
 @Slf4j
-public class Test {
+@ExtendWith({MockitoExtension.class})
+public class SqlSessionFactoryBuilderTest {
 
-  @org.junit.Test
-  public void test() throws IOException {
-    exec();
-  }
-
-  /**
-   * mybatis 初始化
-   */
-  private static void exec() {
+  @Test
+  void queryUser() {
     String resource = "mybatis-config.xml";
     //使用ClassLoader获得当前项目路径
     try {

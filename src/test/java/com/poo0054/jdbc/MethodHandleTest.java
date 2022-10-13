@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.poo0054;
+package com.poo0054.jdbc;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

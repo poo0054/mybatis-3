@@ -36,7 +36,7 @@ public class ExampleTypeHandler extends BaseTypeHandler<String> {
 
   @Override
   public String getNullableResult(ResultSet rs, String columnName) throws SQLException {
-    java.sql.Date date = rs.getDate(columnName);
+    Date date = rs.getDate(columnName);
     if (date != null) {
       return date.toString();
     }

@@ -16,22 +16,20 @@
        limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <modules>
-    <module>mybatis-study</module>
-  </modules>
 
   <parent>
     <groupId>org.mybatis</groupId>
     <artifactId>mybatis-parent</artifactId>
     <version>34</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <artifactId>mybatis</artifactId>
   <version>3.5.11-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <name>mybatis</name>
   <description>
@@ -146,6 +144,12 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.20</version>
+    </dependency>
+
     <dependency>
       <groupId>ognl</groupId>
       <artifactId>ognl</artifactId>
@@ -412,6 +416,14 @@
           <exclude>**/*.java</exclude>
         </excludes>
       </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <includes>
+          <include/>
+          <include>log4j.properties</include>
+          <include>**/*.xml</include>
+        </includes>
+      </testResource>
     </testResources>
   </build>
 
@@ -425,7 +437,7 @@
         </property>
       </activation>
       <properties>
-        <excludedGroups />
+        <excludedGroups/>
       </properties>
     </profile>
     <profile>

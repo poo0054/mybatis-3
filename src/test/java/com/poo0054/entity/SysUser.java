@@ -17,8 +17,8 @@ package com.poo0054.entity;
 
 import lombok.Data;
 
-import java.util.Date;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * (SysUser)实体类
