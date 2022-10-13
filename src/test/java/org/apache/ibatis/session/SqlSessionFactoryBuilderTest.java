@@ -15,10 +15,12 @@
  */
 package org.apache.ibatis.session;
 
+import com.poo0054.constant.FileConstant;
 import com.poo0054.dao.SysUserDao;
 import com.poo0054.entity.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,32 +38,32 @@ import java.util.List;
 @ExtendWith({MockitoExtension.class})
 public class SqlSessionFactoryBuilderTest {
 
-  @Test
-  void queryUser() {
-    String resource = "mybatis-config.xml";
-    //使用ClassLoader获得当前项目路径
+  private SqlSessionFactory sqlSessionFactory;
+
+  private SqlSessionFactory testSessionFactory;
+
+  @BeforeEach
+  void init() {
     try {
-      InputStream inputStream = Resources.getResourceAsStream(resource);
+      InputStream inputStream = Resources.getResourceAsStream(FileConstant.mybatisConfig);
       //获取DefaultSqlSessionFactory对象
-      SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+      sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream, null, null);
 
-      /*//使用另外一套数据源
-      InputStream resourceAsStream = Resources.getResourceAsStream(resource);
-      SqlSessionFactory testSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream, "test");
-      SqlSession sqlSession1 = testSessionFactory.openSession();
-      SysUserDao sysUserDao = sqlSession1.getMapper(SysUserDao.class);
-      List<SysUser> sysUsers = sysUserDao.queryAllByLimit(new SysUser());
-      log.debug(sysUsers.toString());*/
-
-
-      //每次都是一个新的sqlSession
-      try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-        SysUserDao roleMapper = sqlSession.getMapper(SysUserDao.class);
-        List<SysUser> sysUser = roleMapper.queryAllByLimit(new SysUser());
-        log.debug(sysUser.toString());
-      }
+      //使用另外一套数据源
+      InputStream resourceAsStream = Resources.getResourceAsStream(FileConstant.mybatisConfig);
+      testSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream, "test");
     } catch (IOException e) {
       e.printStackTrace();
+    }
+  }
+
+  @Test
+  void queryUser() {
+    //每次都是一个新的sqlSession
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      SysUserDao roleMapper = sqlSession.getMapper(SysUserDao.class);
+      List<SysUser> sysUser = roleMapper.queryAllByLimit(new SysUser());
+      log.info(sysUser.toString());
     }
   }
 

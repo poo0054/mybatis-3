@@ -256,6 +256,14 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析properties中属性
+   * <p>
+   * url和resource使用 Resources#getResourceAsProperties 或 Resources#getUrlAsProperties解析
+   *
+   * @param context
+   * @throws Exception
+   */
   private void propertiesElement(XNode context) throws Exception {
     if (context != null) {
       //获取name和value

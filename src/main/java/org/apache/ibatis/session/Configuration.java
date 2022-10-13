@@ -131,6 +131,9 @@ public class Configuration {
    */
   protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
 
+  /**
+   * 基本变量 比如链接账号密码url等
+   */
   protected Properties variables = new Properties();
 
   /**

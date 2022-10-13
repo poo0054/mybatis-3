@@ -44,6 +44,9 @@ public class XPathParser {
   private final Document document;
   private boolean validation;
   private EntityResolver entityResolver;
+  /**
+   * 基本参数 比如url 账号密码等
+   */
   private Properties variables;
   private XPath xpath;
 
