@@ -15,22 +15,19 @@
  */
 package org.apache.ibatis.reflection;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.*;
+
+/**
+ * {@link Param} 注解的扫描工具和处理工具
+ */
 public class ParamNameResolver {
 
   public static final String GENERIC_NAME_PREFIX = "param";
@@ -56,25 +53,34 @@ public class ParamNameResolver {
 
   public ParamNameResolver(Configuration config, Method method) {
     this.useActualParamName = config.isUseActualParamName();
+    // 方法参数类型
     final Class<?>[] paramTypes = method.getParameterTypes();
+    // 参数上的注解
     final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+    //  参数索引和参数名称
+    // {参数索引:参数名称}
     final SortedMap<Integer, String> map = new TreeMap<>();
     int paramCount = paramAnnotations.length;
     // get names from @Param annotations
     for (int paramIndex = 0; paramIndex < paramCount; paramIndex++) {
       if (isSpecialParameter(paramTypes[paramIndex])) {
         // skip special parameters
+        // 如果是特殊类型跳过
         continue;
       }
       String name = null;
+      // 注解扫描@Param
       for (Annotation annotation : paramAnnotations[paramIndex]) {
+        // 是否为 Param 注解的下级
         if (annotation instanceof Param) {
           hasParamAnnotation = true;
+          // 获取 value 属性值
           name = ((Param) annotation).value();
           break;
         }
       }
       if (name == null) {
+        // 如果没有写 @param 处理方式如下
         // @Param was not specified.
         if (useActualParamName) {
           name = getActualParamName(method, paramIndex);
@@ -85,15 +91,29 @@ public class ParamNameResolver {
           name = String.valueOf(map.size());
         }
       }
+      // 循环参数列表 放入map 对象
       map.put(paramIndex, name);
     }
     names = Collections.unmodifiableSortedMap(map);
   }
 
+  /**
+   * 返回方法名  参数索引
+   *
+   * @param method
+   * @param paramIndex
+   * @return
+   */
   private String getActualParamName(Method method, int paramIndex) {
     return ParamNameUtil.getParamNames(method).get(paramIndex);
   }
 
+  /**
+   * 是否为特殊参数 , 依据 是否是 {@link RowBounds} 或者 {@link  ResultHandler}
+   *
+   * @param clazz
+   * @return
+   */
   private static boolean isSpecialParameter(Class<?> clazz) {
     return RowBounds.class.isAssignableFrom(clazz) || ResultHandler.class.isAssignableFrom(clazz);
   }
@@ -114,24 +134,29 @@ public class ParamNameResolver {
    * In addition to the default names, this method also adds the generic names (param1, param2,
    * ...).
    * </p>
+   * 通常参数异常在这个地方抛出 param ... 异常
+   * 获取参数名称,和参数传递的真实数据
    *
-   * @param args
-   *          the args
+   * @param args the args
    * @return the named params
    */
   public Object getNamedParams(Object[] args) {
     final int paramCount = names.size();
     if (args == null || paramCount == 0) {
+      // 是否有参数
       return null;
     } else if (!hasParamAnnotation && paramCount == 1) {
+      // 没有使用 @param 注解 参数只有一个
       Object value = args[names.firstKey()];
       return wrapToMapIfCollection(value, useActualParamName ? names.get(0) : null);
     } else {
+      // 根据索引创建
       final Map<String, Object> param = new ParamMap<>();
       int i = 0;
       for (Map.Entry<Integer, String> entry : names.entrySet()) {
         param.put(entry.getValue(), args[entry.getKey()]);
         // add generic param names (param1, param2, ...)
+        // param + 当前索引位置
         final String genericParamName = GENERIC_NAME_PREFIX + (i + 1);
         // ensure not to overwrite parameter named with @Param
         if (!names.containsValue(genericParamName)) {
@@ -146,7 +171,7 @@ public class ParamNameResolver {
   /**
    * Wrap to a {@link ParamMap} if object is {@link Collection} or array.
    *
-   * @param object a parameter object
+   * @param object          a parameter object
    * @param actualParamName an actual parameter name
    *                        (If specify a name, set an object to {@link ParamMap} with specified name)
    * @return a {@link ParamMap}
