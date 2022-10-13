@@ -15,16 +15,12 @@
  */
 package org.apache.ibatis.reflection.wrapper;
 
-import java.util.List;
-
-import org.apache.ibatis.reflection.ExceptionUtil;
-import org.apache.ibatis.reflection.MetaClass;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.ReflectionException;
-import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.reflection.*;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.invoker.Invoker;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
+
+import java.util.List;
 
 /**
  * @author Clinton Begin
@@ -42,20 +38,26 @@ public class BeanWrapper extends BaseWrapper {
 
   @Override
   public Object get(PropertyTokenizer prop) {
+    // 索引不为空
     if (prop.getIndex() != null) {
+      // 实例化集合对象
       Object collection = resolveCollection(prop, object);
       return getCollectionValue(prop, collection);
     } else {
+      // 没有索引
       return getBeanProperty(prop, object);
     }
   }
 
   @Override
   public void set(PropertyTokenizer prop, Object value) {
+    // 是否存在索引
     if (prop.getIndex() != null) {
       Object collection = resolveCollection(prop, object);
+      // 向上层调用 BaseWrapper
       setCollectionValue(prop, collection, value);
     } else {
+      // 本类方法
       setBeanProperty(prop, object, value);
     }
   }
