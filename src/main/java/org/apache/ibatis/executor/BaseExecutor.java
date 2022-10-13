@@ -15,14 +15,6 @@
  */
 package org.apache.ibatis.executor;
 
-import static org.apache.ibatis.executor.ExecutionPlaceholder.EXECUTION_PLACEHOLDER;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.cache.impl.PerpetualCache;
 import org.apache.ibatis.cursor.Cursor;
@@ -30,11 +22,7 @@ import org.apache.ibatis.executor.statement.StatementUtil;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.logging.jdbc.ConnectionLogger;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.mapping.ParameterMode;
-import org.apache.ibatis.mapping.StatementType;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.session.Configuration;
@@ -44,22 +32,55 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static org.apache.ibatis.executor.ExecutionPlaceholder.EXECUTION_PLACEHOLDER;
+
 /**
+ * BaseExecutor 是一个实现了 Executor 接口的抽象类，它实现了 Executor 接口的大部分方法。
+ * BaseExecutor 中主要提供了缓存管理和事务管理的基本功能，
+ * 继承 BaseExecutor 的子类只要实现四个基本方法来完成数据库的相关操作即可，
+ * 这四个方法分别是：doUpdate()方法、doQuery()方法、doQueryCursor()方法、doFlushStatement()方法。
+ *
  * @author Clinton Begin
  */
 public abstract class BaseExecutor implements Executor {
 
   private static final Log log = LogFactory.getLog(BaseExecutor.class);
-
+  /**
+   * 事务对象，用于实现事务的提交、回滚和关闭
+   */
   protected Transaction transaction;
+  /**
+   * 其中封装的Executor对象
+   */
   protected Executor wrapper;
 
+  /**
+   * 延迟加载队列
+   */
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
+  /**
+   * 一级缓存，用于缓存该Executor对象查询结果集映射得到的结果对象
+   */
   protected PerpetualCache localCache;
+  /**
+   * 一级缓存，用于缓存输出类型的参数
+   */
   protected PerpetualCache localOutputParameterCache;
   protected Configuration configuration;
 
+  /**
+   * 记录嵌套查询的层数
+   */
   protected int queryStack;
+  /**
+   * 是否关闭
+   */
   private boolean closed;
 
   protected BaseExecutor(Configuration configuration, Transaction transaction) {
@@ -84,6 +105,7 @@ public abstract class BaseExecutor implements Executor {
   public void close(boolean forceRollback) {
     try {
       try {
+        // 根据forceRollback参数决定 是否强制回滚该事务
         rollback(forceRollback);
       } finally {
         if (transaction != null) {
@@ -113,7 +135,10 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // 清除一级缓存，该方法会调用localCache和localOutputParameterCache
+    // 的clear()方法清除缓存
     clearLocalCache();
+    // 抽象方法，交由子类实现
     return doUpdate(ms, parameter);
   }
 
@@ -131,34 +156,47 @@ public abstract class BaseExecutor implements Executor {
 
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
+    // 获取BoundSql对象
     BoundSql boundSql = ms.getBoundSql(parameter);
+    // 创建CacheKey对象，该对象由多个参数组装而成
     CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);
+    // query方法的重载，进行后续处理
     return query(ms, parameter, rowBounds, resultHandler, key, boundSql);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+    // 检查当前Executor是否已关闭
     ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
+      // 非嵌套查询，且<select>节点配置的flushCache属性为true时，才会清空一级缓存
       clearLocalCache();
     }
     List<E> list;
     try {
+      // 增加查询层数
       queryStack++;
+      // 根据传入的CacheKey对象 查询一级缓存
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
+        // 针对存储过程调用的处理，在一级缓存命中时，获取缓存中保存的输出类型参数
+        // 并设置到用户传入的实参parameter对象中
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
+        // 缓存未命中，则从数据库查询结果集，其中会调用doQuery()方法完成数据库查询操作，
+        // 该方法为抽象方法，由BaseExecutor的子类实现
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
+      // 当前查询完成，查询层数减少
       queryStack--;
     }
     if (queryStack == 0) {
+      // 延迟加载的相关内容
       for (DeferredLoad deferredLoad : deferredLoads) {
         deferredLoad.load();
       }
@@ -196,6 +234,8 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // 可以看到CacheKey对象由MappedStatement的id、RowBounds的offset和limit
+    // sql语句(包含占位符"?")、用户传递的实参组成
     CacheKey cacheKey = new CacheKey();
     cacheKey.update(ms.getId());
     cacheKey.update(rowBounds.getOffset());
@@ -204,7 +244,9 @@ public abstract class BaseExecutor implements Executor {
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry();
     // mimic DefaultParameterHandler logic
+    // 获取用户传入的实参，并添加到CacheKey对象中
     for (ParameterMapping parameterMapping : parameterMappings) {
+      // 过滤掉输出类型的参数
       if (parameterMapping.getMode() != ParameterMode.OUT) {
         Object value;
         String propertyName = parameterMapping.getProperty();
@@ -218,11 +260,15 @@ public abstract class BaseExecutor implements Executor {
           MetaObject metaObject = configuration.newMetaObject(parameterObject);
           value = metaObject.getValue(propertyName);
         }
+        // 将实参添加到CacheKey对象中
         cacheKey.update(value);
       }
     }
+    // 如果configuration的environment不为空，则将该environment的id
+    // 添加到CacheKey对象中
     if (configuration.getEnvironment() != null) {
       // issue #176
+
       cacheKey.update(configuration.getEnvironment().getId());
     }
     return cacheKey;
@@ -235,11 +281,15 @@ public abstract class BaseExecutor implements Executor {
 
   @Override
   public void commit(boolean required) throws SQLException {
+    // 检查当前连接是否已关闭
     if (closed) {
       throw new ExecutorException("Cannot commit, transaction is already closed");
     }
+    // 清除一级缓存
     clearLocalCache();
+    // 不执行Executor中缓存的SQL语句
     flushStatements();
+    // 根据参数required决定是否提交事务
     if (required) {
       transaction.commit();
     }
@@ -249,9 +299,12 @@ public abstract class BaseExecutor implements Executor {
   public void rollback(boolean required) throws SQLException {
     if (!closed) {
       try {
+        // 清除一级缓存
         clearLocalCache();
+        // 批量执行缓存的sql语句
         flushStatements(true);
       } finally {
+        // 根据required决定是否回滚事务
         if (required) {
           transaction.rollback();
         }
@@ -272,10 +325,10 @@ public abstract class BaseExecutor implements Executor {
   protected abstract List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException;
 
   protected abstract <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)
-      throws SQLException;
+    throws SQLException;
 
   protected abstract <E> Cursor<E> doQueryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds, BoundSql boundSql)
-      throws SQLException;
+    throws SQLException;
 
   protected void closeStatement(Statement statement) {
     if (statement != null) {
@@ -290,12 +343,10 @@ public abstract class BaseExecutor implements Executor {
   /**
    * Apply a transaction timeout.
    *
-   * @param statement
-   *          a current statement
-   * @throws SQLException
-   *           if a database access error occurs, this method is called on a closed <code>Statement</code>
-   * @since 3.4.0
+   * @param statement a current statement
+   * @throws SQLException if a database access error occurs, this method is called on a closed <code>Statement</code>
    * @see StatementUtil#applyTransactionTimeout(Statement, Integer, Integer)
+   * @since 3.4.0
    */
   protected void applyTransactionTimeout(Statement statement) throws SQLException {
     StatementUtil.applyTransactionTimeout(statement, statement.getQueryTimeout(), transaction.getTimeout());
