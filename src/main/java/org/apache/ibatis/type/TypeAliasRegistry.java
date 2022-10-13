@@ -27,7 +27,10 @@ import java.util.*;
  * @author Clinton Begin
  */
 public class TypeAliasRegistry {
-
+  /**
+   * 别名存放仓库
+   * 是一个map key=>别名,value=>clas
+   */
   private final Map<String, Class<?>> typeAliases = new HashMap<>();
 
   public TypeAliasRegistry() {
@@ -150,6 +153,13 @@ public class TypeAliasRegistry {
     registerAlias(alias, type);
   }
 
+  /**
+   * 别名注册,
+   * typeAliases 是一个map key=>别名,value=>字节码
+   *
+   * @param alias 别名名称
+   * @param value 别名的字节码
+   */
   public void registerAlias(String alias, Class<?> value) {
     if (alias == null) {
       throw new TypeException("The parameter alias cannot be null");

@@ -101,6 +101,7 @@ public class Reflector {
       addSetMethods(classMethods);
       //添加type类中所有属性 不在set或get中就添加
       // set -> SetFieldInvoker  get - > getFieldInvoker  调用invoke赋值
+      // 字段值
       addFields(clazz);
     }
 
@@ -138,6 +139,9 @@ public class Reflector {
     resolveGetterConflicts(conflictingGetters);
   }
 
+  /**
+   * 这个方法解决了get方法的冲突问题,同名方法不同返回值
+   */
   private void resolveGetterConflicts(Map<String, List<Method>> conflictingGetters) {
     for (Entry<String, List<Method>> entry : conflictingGetters.entrySet()) {
       Method winner = null;
@@ -321,9 +325,12 @@ public class Reflector {
    * @return An array containing all methods in this class
    */
   private Method[] getClassMethods(Class<?> clazz) {
+    // 方法唯一标识: 方法
     Map<String, Method> uniqueMethods = new HashMap<>();
     Class<?> currentClass = clazz;
     while (currentClass != null && currentClass != Object.class) {
+      // getDeclaredMethods 获取 public ,private , protcted 方法
+      // getMethods 获取本身和父类的 public 方法
       addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
 
       // we also need to look for interface methods -
@@ -338,7 +345,7 @@ public class Reflector {
         //添加抽象类（接口）的方法
         addUniqueMethods(uniqueMethods, anInterface.getMethods());
       }
-
+      // 循环往上一层一层寻找最后回到 Object 类 的上级为null 结束
       currentClass = currentClass.getSuperclass();
     }
 
@@ -366,6 +373,12 @@ public class Reflector {
     }
   }
 
+  /**
+   * 方法唯一标识,返回值类型#方法名称：参数列表
+   *
+   * @param method
+   * @return
+   */
   private String getSignature(Method method) {
     StringBuilder sb = new StringBuilder();
     Class<?> returnType = method.getReturnType();

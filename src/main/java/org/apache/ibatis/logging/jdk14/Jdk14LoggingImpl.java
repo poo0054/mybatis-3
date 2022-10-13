@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.logging.jdk14;
 
+import org.apache.ibatis.logging.Log;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.ibatis.logging.Log;
 
 /**
  * @author Clinton Begin
@@ -27,6 +27,11 @@ public class Jdk14LoggingImpl implements Log {
 
   private final Logger log;
 
+  /**
+   * 创建日志实例
+   *
+   * @param clazz
+   */
   public Jdk14LoggingImpl(String clazz) {
     log = Logger.getLogger(clazz);
   }
