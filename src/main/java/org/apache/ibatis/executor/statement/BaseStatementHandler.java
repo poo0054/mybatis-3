@@ -76,7 +76,8 @@ public abstract class BaseStatementHandler implements StatementHandler {
     this.typeHandlerRegistry = configuration.getTypeHandlerRegistry();
     this.objectFactory = configuration.getObjectFactory();
 
-    if (boundSql == null) { // issue #435, get the key before calculating the statement
+    // issue #435, get the key before calculating the statement
+    if (boundSql == null) {
       // 其中调用了KeyGenerator的processBefore()方法
       // 用于初始化SQL语句的主键
       generateKeys(parameterObject);

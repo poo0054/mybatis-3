@@ -15,12 +15,6 @@
  */
 package org.apache.ibatis.executor.statement;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
 import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
@@ -32,6 +26,12 @@ import org.apache.ibatis.mapping.ResultSetType;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+
 /**
  * @author Clinton Begin
  */
@@ -41,19 +41,31 @@ public class SimpleStatementHandler extends BaseStatementHandler {
     super(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
   }
 
+  /**
+   * 本方法用于执行insert、delete、update等类型的SQL语句，并且会根据配置的
+   * KeyGenerator获取数据库生成的主键
+   */
   @Override
   public int update(Statement statement) throws SQLException {
+    // 获取SQL语句 及parameterObject
     String sql = boundSql.getSql();
     Object parameterObject = boundSql.getParameterObject();
+    // 获取配置的KeyGenerator 数据库主键生成器
     KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
     int rows;
     if (keyGenerator instanceof Jdbc3KeyGenerator) {
+      // 执行SQL语句
       statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
+      // 获取更新的条数
       rows = statement.getUpdateCount();
+      // 将数据库生成的主键添加到parameterObject中
       keyGenerator.processAfter(executor, mappedStatement, statement, parameterObject);
     } else if (keyGenerator instanceof SelectKeyGenerator) {
+      // 执行SQL语句
       statement.execute(sql);
+      // 获取更新的条数
       rows = statement.getUpdateCount();
+      // 执行<selectKey>节点中配置的SQL语句，将从数据库获取到的主键 添加到parameterObject中
       keyGenerator.processAfter(executor, mappedStatement, statement, parameterObject);
     } else {
       statement.execute(sql);
@@ -72,6 +84,7 @@ public class SimpleStatementHandler extends BaseStatementHandler {
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
     String sql = boundSql.getSql();
     statement.execute(sql);
+    // 从statement中获取结果集，并进行映射处理
     return resultSetHandler.handleResultSets(statement);
   }
 
@@ -82,11 +95,16 @@ public class SimpleStatementHandler extends BaseStatementHandler {
     return resultSetHandler.handleCursorResultSets(statement);
   }
 
+  /**
+   * 直接通过Connection创建Statement对象
+   */
   @Override
   protected Statement instantiateStatement(Connection connection) throws SQLException {
     if (mappedStatement.getResultSetType() == ResultSetType.DEFAULT) {
+      // 如果结果集类型是DEFAULT默认的，则直接用connection创建Statement对象
       return connection.createStatement();
     } else {
+      // 否则，设置结果集类型，设置结果集 只读
       return connection.createStatement(mappedStatement.getResultSetType().getValue(), ResultSet.CONCUR_READ_ONLY);
     }
   }
