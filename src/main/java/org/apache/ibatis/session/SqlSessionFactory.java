@@ -19,6 +19,9 @@ import java.sql.Connection;
 
 /**
  * Creates an {@link SqlSession} out of a connection or a DataSource
+ * <p>
+ * 提供了openSession()方法的多种重载，根据相应的参数 可以指定事务的隔离级别、
+ * 底层使用的Executor类型、以及是否自动提交事务等配置
  *
  * @author Clinton Begin
  */

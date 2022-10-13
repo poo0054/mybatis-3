@@ -15,20 +15,18 @@
  */
 package org.apache.ibatis.transaction.managed;
 
-import java.sql.Connection;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.Properties;
 
 /**
  * Creates {@link ManagedTransaction} instances.
  *
  * @author Clinton Begin
- *
  * @see ManagedTransaction
  */
 public class ManagedTransactionFactory implements TransactionFactory {
@@ -55,6 +53,11 @@ public class ManagedTransactionFactory implements TransactionFactory {
     // Silently ignores autocommit and isolation level, as managed transactions are entirely
     // controlled by an external manager.  It's silently ignored so that
     // code remains portable between managed and unmanaged configurations.
+    /*
+    默认忽略自动提交和隔离级别，因为托管事务完全
+    由外部经理控制。它被默默地忽略，所以
+    代码在托管和非托管配置之间保持可移植性。
+     */
     return new ManagedTransaction(ds, level, closeConnection);
   }
 }

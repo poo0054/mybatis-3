@@ -15,6 +15,10 @@
  */
 package org.apache.ibatis.session;
 
+import org.apache.ibatis.cursor.Cursor;
+import org.apache.ibatis.executor.BatchResult;
+import org.apache.ibatis.reflection.ExceptionUtil;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.InvocationHandler;
@@ -25,28 +29,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.ibatis.cursor.Cursor;
-import org.apache.ibatis.executor.BatchResult;
-import org.apache.ibatis.reflection.ExceptionUtil;
-
 /**
  * @author Larry Meadors
  */
 public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 
+  /**
+   * 通过持有DefaultSqlSessionFactory对象 来产生SqlSession对象
+   */
   private final SqlSessionFactory sqlSessionFactory;
+
+  /**
+   * localSqlSession中记录的SqlSession对象的代理对象（JDK动态代理）
+   * SqlSessionManager初始化时 生成本代理对象，可以看下 下面的构造函数
+   */
   private final SqlSession sqlSessionProxy;
 
+  /**
+   * 用于记录一个与当前线程绑定的SqlSession对象
+   */
   private final ThreadLocal<SqlSession> localSqlSession = new ThreadLocal<>();
 
+  /**
+   * 私有的构造函数，也是SqlSessionManager唯一的构造函数
+   */
   private SqlSessionManager(SqlSessionFactory sqlSessionFactory) {
+    //传入的这个SqlSessionFactory对象 往往是DefaultSqlSessionFactory的实例
     this.sqlSessionFactory = sqlSessionFactory;
+    //JDK动态代理生成代理对象，可以看得出，SqlSessionInterceptor一定实现了
+    // InvocationHandler接口
     this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(
-        SqlSessionFactory.class.getClassLoader(),
-        new Class[]{SqlSession.class},
-        new SqlSessionInterceptor());
+      SqlSessionFactory.class.getClassLoader(),
+      new Class[]{SqlSession.class},
+      new SqlSessionInterceptor());
   }
 
+  /**
+   * 通过newInstance()方法创建SqlSessionManager对象，有多种重载，
+   * 但最后都是new了一个DefaultSqlSessionFactory的实例
+   */
   public static SqlSessionManager newInstance(Reader reader) {
     return new SqlSessionManager(new SqlSessionFactoryBuilder().build(reader, null, null));
   }
@@ -111,6 +132,9 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
     return this.localSqlSession.get() != null;
   }
 
+  /**
+   * openSession()系列方法都是通过当前SqlSessionManager对象持有的   * DefaultSqlSessionFactory实例的openSession()实现的
+   */
   @Override
   public SqlSession openSession() {
     return sqlSessionFactory.openSession();
@@ -339,25 +363,33 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 
   private class SqlSessionInterceptor implements InvocationHandler {
     public SqlSessionInterceptor() {
-        // Prevent Synthetic Access
+      // Prevent Synthetic Access
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      //获取 与当前线程绑定的SqlSession
       final SqlSession sqlSession = SqlSessionManager.this.localSqlSession.get();
+      //如果有绑定的SqlSession对象   - 模式一
       if (sqlSession != null) {
         try {
+          //调用真正的sqlSession对象，完成数据库操作
           return method.invoke(sqlSession, args);
         } catch (Throwable t) {
           throw ExceptionUtil.unwrapThrowable(t);
         }
       } else {
+        // 如果没有绑定的SqlSession对象 - 模式二
+        //创建一个新的SqlSession对象
         try (SqlSession autoSqlSession = openSession()) {
           try {
+            // 通过反射调用该SqlSession对象的方法，完成数据库操作
             final Object result = method.invoke(autoSqlSession, args);
+            // 提交事务
             autoSqlSession.commit();
             return result;
           } catch (Throwable t) {
+            // 出异常就回滚
             autoSqlSession.rollback();
             throw ExceptionUtil.unwrapThrowable(t);
           }
