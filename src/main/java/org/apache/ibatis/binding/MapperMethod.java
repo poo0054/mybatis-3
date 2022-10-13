@@ -405,6 +405,12 @@ public class MapperMethod {
       this.paramNameResolver = new ParamNameResolver(configuration, method);
     }
 
+    /**
+     * 方法主要是把方法参数转换为SQL命令参数。
+     *
+     * @param args
+     * @return
+     */
     public Object convertArgsToSqlCommandParam(Object[] args) {
       return paramNameResolver.getNamedParams(args);
     }
@@ -478,6 +484,13 @@ public class MapperMethod {
       return mapKey;
     }
 
+
+    /**
+     * 获取 {@link MapKey} 注解数据
+     *
+     * @param method
+     * @return
+     */
     private String getMapKey(Method method) {
       String mapKey = null;
       if (Map.class.isAssignableFrom(method.getReturnType())) {
