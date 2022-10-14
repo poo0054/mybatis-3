@@ -165,7 +165,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       environmentsElement(root.evalNode("environments"));
       //databaseIdProvider 多套环境配置   根据当前链接的url获取产品名称 进行解析 设置为value
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
-      //类型处理器  java类型转换jdbc类型
+      //类型处理器  可以根据包名  指定的全类名获取类型转化器
       typeHandlerElement(root.evalNode("typeHandlers"));
       //注册所有mapper
       mapperElement(root.evalNode("mappers"));
