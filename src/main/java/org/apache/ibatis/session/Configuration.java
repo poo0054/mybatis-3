@@ -234,6 +234,9 @@ public class Configuration {
    */
   protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<>();
   protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<>();
+  /**
+   * mapper MapperAnnotationBuilder
+   */
   protected final Collection<MethodResolver> incompleteMethods = new LinkedList<>();
 
   /*

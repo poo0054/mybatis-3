@@ -70,6 +70,12 @@ public class MapperRegistry {
     return knownMappers.containsKey(type);
   }
 
+  /**
+   * 添加type
+   *
+   * @param type
+   * @param <T>
+   */
   public <T> void addMapper(Class<T> type) {
     // 该 type 是不是接口
     if (type.isInterface()) {

@@ -160,6 +160,9 @@
 
   <mappers>
     <mapper resource="mapper/SysUserDao.xml"/>
+
+    <!-- 如果使用package xml和java文件必须放一起  MapperAnnotationBuilder只解析了   -->
+    <!--    <package name="com.poo0054.dao"/>-->
   </mappers>
 
 </configuration>

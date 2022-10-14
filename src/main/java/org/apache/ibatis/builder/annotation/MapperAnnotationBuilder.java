@@ -94,9 +94,11 @@ public class MapperAnnotationBuilder {
           parseResultMap(method);
         }
         try {
+          //注入config中
           // 解析 SelectKey、ResultMap 等注解，并创建 MappedStatement对象
           parseStatement(method);
         } catch (IncompleteElementException e) {
+          //注入config中
           // 如果解析过程出现 IncompleteElementException异常，可能是因为引用了
           // 未解析的注解，这里将出现异常的方法记录下来，后面提供补偿机制，重新进行解析
           configuration.addIncompleteMethod(new MethodResolver(this, method));
@@ -146,6 +148,7 @@ public class MapperAnnotationBuilder {
       }
       if (inputStream != null) {
         XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource, configuration.getSqlFragments(), type.getName());
+        //解析对应的xml文件
         xmlParser.parse();
       }
     }
