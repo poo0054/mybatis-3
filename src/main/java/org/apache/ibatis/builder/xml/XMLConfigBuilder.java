@@ -158,7 +158,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
       //自定义reflectorFactory
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
-      //settings元素
+      //settings元素 主要是set
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
       //环境元素解析
