@@ -121,6 +121,13 @@ public abstract class BaseBuilder {
     }
   }
 
+  /**
+   * 根据别名找到指定的类 如果不存在 用当前alias创建一个类
+   *
+   * @param alias
+   * @param <T>
+   * @return
+   */
   protected <T> Class<? extends T> resolveClass(String alias) {
     if (alias == null) {
       return null;

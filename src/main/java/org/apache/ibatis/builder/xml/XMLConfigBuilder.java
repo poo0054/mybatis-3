@@ -161,9 +161,9 @@ public class XMLConfigBuilder extends BaseBuilder {
       //settings元素 主要是set
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
-      //环境元素解析
+      //环境元素解析  构建Environment对象  其中有DataSource和transactionFactory
       environmentsElement(root.evalNode("environments"));
-      //databaseIdProvider 多套环境配置
+      //databaseIdProvider 多套环境配置   根据当前链接的url获取产品名称 进行解析 设置为value
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
       //类型处理器  java类型转换jdbc类型
       typeHandlerElement(root.evalNode("typeHandlers"));
@@ -337,11 +337,12 @@ public class XMLConfigBuilder extends BaseBuilder {
       for (XNode child : context.getChildren()) {
         //获取当前环境的id
         String id = child.getStringAttribute("id");
-        //当前环境是否为默认环境
+        //当前环境是否为默认环境  不是默认环境就不加载
         if (isSpecifiedEnvironment(id)) {
           //获取transactionManager的类型并获取事务工厂  (一般事务交给spring事务管理)  实例化 TransactionFactory
           TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
           //获取当前数据源工厂  创建 DataSourceFactory 和 DataSource
+          //底层使用 MetaObject 进行赋值
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           //创建数据源
           DataSource dataSource = dsFactory.getDataSource();
@@ -390,7 +391,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (context != null) {
       String type = context.getStringAttribute("type");
       Properties props = context.getChildrenAsProperties();
-      //根据事务type创建事务工厂
+      //使用别名创建一个TransactionFactory
       TransactionFactory factory = (TransactionFactory) resolveClass(type).getDeclaredConstructor().newInstance();
       factory.setProperties(props);
       return factory;
