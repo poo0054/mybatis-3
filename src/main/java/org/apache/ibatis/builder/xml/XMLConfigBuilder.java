@@ -150,9 +150,9 @@ public class XMLConfigBuilder extends BaseBuilder {
       loadCustomLogImpl(settings);
       //别名类型元素解析
       typeAliasesElement(root.evalNode("typeAliases"));
-      //插件元素解析 todo
+      //插件元素解析
       pluginElement(root.evalNode("plugins"));
-      //自定义objectFactory元素解析
+      //自定义objectFactory元素解析 TODO
       objectFactoryElement(root.evalNode("objectFactory"));
       //自定义objectWrapperFactory
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
@@ -222,7 +222,7 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void pluginElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
-        //获取全类名 也可以是别名
+        //获取全类名 也可以是别名 别名需要注册
         String interceptor = child.getStringAttribute("interceptor");
         //获取所有property属性
         Properties properties = child.getChildrenAsProperties();

@@ -41,6 +41,7 @@ public class ExamplePlugin implements Interceptor {
     // implement pre processing if need
     Object returnObject = invocation.proceed();
     // implement post processing if need
+
     return returnObject;
   }
 

@@ -116,11 +116,11 @@
   </objectFactory>
 
   <!-- mybatis-config.xml -->
-  <!-- <plugins>
-     <plugin interceptor="com.poo0054.example.ExamplePlugin">
-       <property name="someProperty" value="100"/>
-     </plugin>
-   </plugins>-->
+  <plugins>
+    <plugin interceptor="com.poo0054.example.ExamplePlugin">
+      <property name="someProperty" value="100"/>
+    </plugin>
+  </plugins>
 
   <environments default="development">
     <environment id="development">
@@ -128,8 +128,8 @@
       <dataSource type="POOLED">
         <property name="driver" value="${driver}"/>
         <property name="url" value="jdbc:mysql://192.168.56.10:3306/yidian_oms"/>
-        <property name="username" value="${name}"/>
-        <property name="password" value="${password}"/>
+        <property name="username" value="${db.name}"/>
+        <property name="password" value="${db.password}"/>
       </dataSource>
     </environment>
     <environment id="test">
