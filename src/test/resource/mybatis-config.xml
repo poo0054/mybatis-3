@@ -115,6 +115,9 @@
     <property name="someProperty" value="100"/>
   </objectFactory>
 
+  <!--  用来创建ObjectWrapper -->
+  <objectWrapperFactory type="com.poo0054.objectWrapper.CustomObjectWrapperFactory"/>
+
   <!-- mybatis-config.xml -->
   <plugins>
     <plugin interceptor="com.poo0054.example.ExamplePlugin">
