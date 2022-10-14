@@ -55,6 +55,8 @@ public class MethodHandleTest {
         调用方法
        */
       String handled_str = (String) mh.invoke("abc", "a", "c");
+
+      "abc".replace("a", "c");
       System.out.print(handled_str);
     } catch (Throwable e) {
       e.printStackTrace();
@@ -106,7 +108,7 @@ public class MethodHandleTest {
     out.invoke(this, strings);
   }
 
-  private void outList(List list) {
+  public void outList(List list) {
     System.out.println("我是" + list);
   }
 

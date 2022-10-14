@@ -2,8 +2,13 @@ package org.apache.ibatis.parsing;
 
 import com.poo0054.constant.FileConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.reflection.DefaultReflectorFactory;
+import org.apache.ibatis.reflection.MetaClass;
+import org.apache.ibatis.reflection.ReflectorFactory;
+import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,32 +28,62 @@ import java.util.Properties;
 public class XPathParserTest {
   InputStream inputStream;
   XPathParser xPathParser;
+  XNode root;
+  /**
+   * 创建并缓存 Reflector对象
+   */
+  private final ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
 
   @BeforeEach
   void before() throws IOException {
     this.inputStream = Resources.getResourceAsStream(FileConstant.mybatisConfig);
     /*
-    解析xml
+    解析xml工具类
      */
     xPathParser = new XPathParser(inputStream, true, null, new XMLMapperEntityResolver());
+    root = xPathParser.evalNode("/configuration");
   }
 
+  /**
+   * log解析
+   */
   @Test
-  void evalNodeTest() throws IOException {
-    XNode root = xPathParser.evalNode("/configuration");
+  void settingsAsPropertiesTest() {
+    XNode context = root.evalNode("settings");
+    if (context != null) {
+      Properties props = context.getChildrenAsProperties();
+      // Check that all settings are known to the configuration class
+      //检查配置类是否知道所有设置
+      //检查该类是否存在配置中属性
+      MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
+      for (Object key : props.keySet()) {
+        //使用set方法进行判断
+        if (!metaConfig.hasSetter(String.valueOf(key))) {
+          throw new BuilderException("The setting " + key + " is not known.  Make sure you spelled it correctly (case sensitive).");
+        }
+      }
+      log.info("props：{}", props);
+    }
+  }
+
+  /**
+   * properties解析
+   *
+   * @throws IOException
+   */
+  @Test
+  void propertiesElementTest() throws IOException {
     XNode context = root.evalNode("properties");
     String resource = context.getStringAttribute("resource");
     String url = context.getStringAttribute("url");
-
     Properties defaults = context.getChildrenAsProperties();
     if (resource != null) {
       defaults.putAll(Resources.getResourceAsProperties(resource));
     } else if (url != null) {
       defaults.putAll(Resources.getUrlAsProperties(url));
     }
-
     log.info(url);
-
   }
+
 
 }

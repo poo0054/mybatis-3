@@ -92,6 +92,7 @@ public class Reflector {
     addDefaultConstructor(clazz);
     //获取type所有方法 包括父类 接口方法
     Method[] classMethods = getClassMethods(clazz);
+    //是否为jdk16的Record类 16新特性
     if (isRecord(type)) {
       addRecordGetMethods(classMethods);
     } else {
@@ -101,7 +102,7 @@ public class Reflector {
       addSetMethods(classMethods);
       //添加type类中所有属性 不在set或get中就添加
       // set -> SetFieldInvoker  get - > getFieldInvoker  调用invoke赋值
-      // 字段值
+      // 字段值 包括父类属性
       addFields(clazz);
     }
 
@@ -133,8 +134,10 @@ public class Reflector {
 
   private void addGetMethods(Method[] methods) {
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
-    //找出参数为空并且get，is方法  get方法
-    Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
+    //过滤参数为空 方法名以get is开头
+    Arrays.stream(methods)
+      .filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
+      // 格式化name并添加入map中
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
     resolveGetterConflicts(conflictingGetters);
   }
@@ -147,6 +150,7 @@ public class Reflector {
       Method winner = null;
       String propName = entry.getKey();
       boolean isAmbiguous = false;
+      //主要解决有多个同名方法
       for (Method candidate : entry.getValue()) {
         if (winner == null) {
           winner = candidate;
@@ -175,10 +179,12 @@ public class Reflector {
   }
 
   private void addGetMethod(String name, Method method, boolean isAmbiguous) {
-    MethodInvoker invoker = isAmbiguous
-      ? new AmbiguousMethodInvoker(method, MessageFormat.format(
+    String format = MessageFormat.format(
       "Illegal overloaded getter method with ambiguous type for property ''{0}'' in class ''{1}''. This breaks the JavaBeans specification and can cause unpredictable results.",
-      name, method.getDeclaringClass().getName()))
+      name, method.getDeclaringClass().getName());
+    //如果是一个
+    MethodInvoker invoker = isAmbiguous
+      ? new AmbiguousMethodInvoker(method, format)
       : new MethodInvoker(method);
     getMethods.put(name, invoker);
     Type returnType = TypeParameterResolver.resolveReturnType(method, type);
@@ -193,7 +199,13 @@ public class Reflector {
     resolveSetterConflicts(conflictingSetters);
   }
 
+  /**
+   * @param conflictingMethods
+   * @param name
+   * @param method
+   */
   private void addMethodConflict(Map<String, List<Method>> conflictingMethods, String name, Method method) {
+    //过滤
     if (isValidPropertyName(name)) {
       List<Method> list = MapUtil.computeIfAbsent(conflictingMethods, name, k -> new ArrayList<>());
       list.add(method);
@@ -329,8 +341,7 @@ public class Reflector {
     Map<String, Method> uniqueMethods = new HashMap<>();
     Class<?> currentClass = clazz;
     while (currentClass != null && currentClass != Object.class) {
-      // getDeclaredMethods 获取 public ,private , protcted 方法
-      // getMethods 获取本身和父类的 public 方法
+      //添加所有方法到 uniqueMethods中 key: 返回值类型#方法名称：参数列表  value：method
       addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
 
       // we also need to look for interface methods -
@@ -339,7 +350,7 @@ public class Reflector {
         我们还需要寻找接口方法-
         因为这个类可能是抽象的
        */
-
+      //获取上级接口
       Class<?>[] interfaces = currentClass.getInterfaces();
       for (Class<?> anInterface : interfaces) {
         //添加抽象类（接口）的方法
@@ -356,7 +367,9 @@ public class Reflector {
 
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
     for (Method currentMethod : methods) {
+      //是否为桥接方法
       if (!currentMethod.isBridge()) {
+        // 返回值类型#方法名称：参数列表
         String signature = getSignature(currentMethod);
         // check to see if the method is already known
         // if it is known, then an extended class must have

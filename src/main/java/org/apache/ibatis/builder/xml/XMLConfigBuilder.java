@@ -121,7 +121,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     Properties props = context.getChildrenAsProperties();
     // Check that all settings are known to the configuration class
     //检查配置类是否知道所有设置
-    //检查该类是否存在配置中属性
+    //构建Configuration的reflector  并缓存
     MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
     for (Object key : props.keySet()) {
       //使用set方法进行判断
@@ -142,6 +142,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       // issue #117 read properties first
       //properties元素解析
       propertiesElement(root.evalNode("properties"));
+      //校验并提取settings中属性  并初始化Configuration在localReflectorFactory中
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       //TODO vfs暂时不看
       loadCustomVfs(settings);
