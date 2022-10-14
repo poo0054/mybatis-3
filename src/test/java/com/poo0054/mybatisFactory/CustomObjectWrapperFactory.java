@@ -1,4 +1,4 @@
-package com.poo0054.objectWrapper;
+package com.poo0054.mybatisFactory;
 
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.wrapper.CollectionWrapper;
@@ -20,6 +20,7 @@ public class CustomObjectWrapperFactory implements ObjectWrapperFactory {
 
   @Override
   public ObjectWrapper getWrapperFor(MetaObject metaObject, Object object) {
+    System.out.println("----我是自定义的 ObjectWrapperFactory");
     return new CollectionWrapper(metaObject, Collections.singleton(object));
   }
 

@@ -116,7 +116,9 @@
   </objectFactory>
 
   <!--  用来创建ObjectWrapper -->
-  <objectWrapperFactory type="com.poo0054.objectWrapper.CustomObjectWrapperFactory"/>
+  <objectWrapperFactory type="com.poo0054.mybatisFactory.CustomObjectWrapperFactory"/>
+
+  <reflectorFactory type="com.poo0054.mybatisFactory.CustomReflectoryFactory"/>
 
   <!-- mybatis-config.xml -->
   <plugins>
