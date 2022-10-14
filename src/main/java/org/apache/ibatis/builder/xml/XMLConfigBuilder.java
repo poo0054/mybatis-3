@@ -146,11 +146,11 @@ public class XMLConfigBuilder extends BaseBuilder {
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       //TODO vfs暂时不看
       loadCustomVfs(settings);
-      //日志配置
+      //日志配置 通过typeAliasRegistry注册的中获取配置文件的类
       loadCustomLogImpl(settings);
       //别名类型元素解析
       typeAliasesElement(root.evalNode("typeAliases"));
-      //插件元素解析
+      //插件元素解析 todo
       pluginElement(root.evalNode("plugins"));
       //自定义objectFactory元素解析
       objectFactoryElement(root.evalNode("objectFactory"));
@@ -195,9 +195,11 @@ public class XMLConfigBuilder extends BaseBuilder {
 
   private void typeAliasesElement(XNode parent) {
     if (parent != null) {
+      //循环找出所有的配置
       for (XNode child : parent.getChildren()) {
         if ("package".equals(child.getName())) {
           String typeAliasPackage = child.getStringAttribute("name");
+          //获取别名注册器进行注册  会把类名小写作为key  value为对象  所有搜索也是需要转换为小写 在别的地方可以不区分大小写
           configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
         } else {
           String alias = child.getStringAttribute("alias");
