@@ -13,9 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.builder.xml;
+package org.apache.ibatis.builder.xml.test;
 
+import lombok.Data;
 import org.apache.ibatis.builder.*;
+import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
+import org.apache.ibatis.builder.xml.XMLStatementBuilder;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.Resources;
@@ -28,31 +31,19 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.*;
 
 /**
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
+@Data
 public class XMLMapperBuilder extends BaseBuilder {
 
   private final XPathParser parser;
   private final MapperBuilderAssistant builderAssistant;
   private final Map<String, XNode> sqlFragments;
   private final String resource;
-
-  @Deprecated
-  public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
-    this(reader, configuration, resource, sqlFragments);
-    this.builderAssistant.setCurrentNamespace(namespace);
-  }
-
-  @Deprecated
-  public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
-    this(new XPathParser(reader, true, configuration.getVariables(), new XMLMapperEntityResolver()),
-      configuration, resource, sqlFragments);
-  }
 
   public XMLMapperBuilder(InputStream inputStream, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
     this(inputStream, configuration, resource, sqlFragments);
@@ -64,7 +55,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       configuration, resource, sqlFragments);
   }
 
-  private XMLMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
+  public XMLMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
     super(configuration);
     this.builderAssistant = new MapperBuilderAssistant(configuration, resource);
     this.parser = parser;
@@ -95,7 +86,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     return sqlFragments.get(refid);
   }
 
-  private void configurationElement(XNode context) {
+  public void configurationElement(XNode context) {
     try {
       // 获取 <mapper>节点 的 namespace属性
       String namespace = context.getStringAttribute("namespace");
@@ -205,10 +196,10 @@ public class XMLMapperBuilder extends BaseBuilder {
   private void cacheElement(XNode context) {
     if (context != null) {
       String type = context.getStringAttribute("type", "PERPETUAL");
-      //缓存
+      //使用别名 或者全类名
       Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
+
       String eviction = context.getStringAttribute("eviction", "LRU");
-      //缓存回收策略
       Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
       Long flushInterval = context.getLongAttribute("flushInterval");
       Integer size = context.getIntAttribute("size");

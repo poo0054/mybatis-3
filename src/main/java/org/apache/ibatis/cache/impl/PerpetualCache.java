@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.cache.impl;
 
+import lombok.Data;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
 
@@ -24,11 +25,17 @@ import java.util.Map;
 /**
  * @author Clinton Begin
  */
+@Data
 public class PerpetualCache implements Cache {
   /**
    * Cache对象 的唯一标识
    */
   private final String id;
+
+  /**
+   * 用来测试在xml中使用cache  如果名称相等 就会进行赋值操作
+   */
+  private String username;
 
   /**
    * 其所有的缓存功能实现，都是基于 JDK 的 HashMap 提供的方法

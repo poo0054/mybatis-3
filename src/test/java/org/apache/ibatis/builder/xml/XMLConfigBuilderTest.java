@@ -1,8 +1,23 @@
+/*
+ *    Copyright 2009-2022 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.builder.xml;
 
 import com.poo0054.constant.FileConstant;
-import com.poo0054.dao.SysUserDao;
-import com.poo0054.entity.SysUser;
+import com.poo0054.dao.TableAttributeDao;
+import com.poo0054.entity.TableAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
@@ -28,13 +43,15 @@ import java.util.List;
 public class XMLConfigBuilderTest {
   private InputStream inputStream;
 
+
   @BeforeEach
   void before() throws IOException {
     this.inputStream = Resources.getResourceAsStream(FileConstant.mybatisConfig);
   }
 
+
   @Test
-  void initTest() {
+  void xmlConfigBuilderTest() {
     /*
     BaseBuilder是所有Builder的父类  里面必须要有一个 Configuration 最初的是从 XMLConfigBuilder new出来的
     new Configuration同时 typeAliasRegistry注册一些默认的别名
@@ -50,9 +67,9 @@ public class XMLConfigBuilderTest {
     //构建
     SqlSession sqlSession = defaultSqlSessionFactory.openSession();
 
-    SysUserDao roleMapper = sqlSession.getMapper(SysUserDao.class);
-    List<SysUser> sysUser = roleMapper.queryAllByLimit(new SysUser());
-    log.info(sysUser.toString());
+    TableAttributeDao roleMapper = sqlSession.getMapper(TableAttributeDao.class);
+    List<TableAttribute> tableAttributes = roleMapper.queryAllByLimit(new TableAttribute());
+    log.info(tableAttributes.toString());
   }
 
 }

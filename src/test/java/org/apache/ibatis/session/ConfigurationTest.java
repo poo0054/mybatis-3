@@ -13,39 +13,34 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.reflection;
+package org.apache.ibatis.session;
 
+import com.poo0054.constant.FileConstant;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.io.Resources;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author ZhangZhi
  * @version 1.0
- * @date 2022/10/14 9:25
+ * @date 2022/10/17 15:46
  */
 @Slf4j
 @ExtendWith({MockitoExtension.class})
-public class MetaClassTest {
-  /**
-   * 创建  Reflector对象
-   */
-  private final ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
+public class ConfigurationTest {
+  private InputStream inputStream;
+  private Configuration configuration;
 
   @BeforeEach
-  void before() {
-
+  void before() throws IOException {
+    this.inputStream = Resources.getResourceAsStream(FileConstant.mybatisConfig);
+    configuration = new Configuration();
   }
 
-  @Test
-  void test() {
-    MetaClass metaConfig = MetaClass.forClass(Configuration.class, reflectorFactory);
-    String[] getterNames = metaConfig.getGetterNames();
-    log.info(getterNames.toString());
 
-
-  }
 }

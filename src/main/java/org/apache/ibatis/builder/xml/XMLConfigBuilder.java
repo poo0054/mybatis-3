@@ -466,8 +466,12 @@ public class XMLConfigBuilder extends BaseBuilder {
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");
-          // 如果 <mapper>节点 指定了 resource 或是 url属性，则创建 XMLMapperBuilder对象 解析
-          // resource 或是 url属性 指定的 Mapper配置文件
+
+          /*
+            resource 和 url属性  使用XMLMapperBuilder解析
+            package 或是 mapperClass 属性  使用mapperRegistry解析
+           */
+
           if (resource != null && url == null && mapperClass == null) {
             ErrorContext.instance().resource(resource);
             try (InputStream inputStream = Resources.getResourceAsStream(resource)) {

@@ -36,7 +36,14 @@ public class MapperBuilderAssistant extends BaseBuilder {
 
   private String currentNamespace;
   private final String resource;
+  /**
+   * 真实使用的cache对象
+   */
   private Cache currentCache;
+
+  /**
+   * 是否完成  如果有依赖其余的对象导致未完成 在使用的时候进行初始化
+   */
   private boolean unresolvedCacheRef; // issue #676
 
   public MapperBuilderAssistant(Configuration configuration, String resource) {
@@ -108,6 +115,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
                            boolean readWrite,
                            boolean blocking,
                            Properties props) {
+    //cacheId使用当前namespace的名字
     Cache cache = new CacheBuilder(currentNamespace)
       .implementation(valueOrDefault(typeClass, PerpetualCache.class))
       .addDecorator(valueOrDefault(evictionClass, LruCache.class))

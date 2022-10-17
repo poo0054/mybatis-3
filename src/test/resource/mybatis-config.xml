@@ -161,6 +161,7 @@
   <mappers>
     <!--    resource 和 url 是走一个资源解析 - XMLMapperBuilder -->
     <mapper resource="mapper/SysUserDao.xml"/>
+    <mapper resource="mapper/TableAttributeDao.xml"/>
     <!--    <mapper url="mapper/SysUserDao.xml"/>-->
 
     <!-- mapper和package是直接使用mapperRegistry进行注册   -->

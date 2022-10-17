@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.cache.decorators;
 
+import org.apache.ibatis.cache.Cache;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.apache.ibatis.cache.Cache;
 
 /**
  * Lru (least recently used) cache decorator.
@@ -50,10 +50,14 @@ public class LruCache implements Cache {
     keyMap = new LinkedHashMap<Object, Object>(size, .75F, true) {
       private static final long serialVersionUID = 4267176411845948333L;
 
+      /**
+       * 如果返回是否删除最老的值
+       */
       @Override
       protected boolean removeEldestEntry(Map.Entry<Object, Object> eldest) {
         boolean tooBig = size() > size;
         if (tooBig) {
+          //如果满足 进行赋值操作
           eldestKey = eldest.getKey();
         }
         return tooBig;
@@ -86,6 +90,7 @@ public class LruCache implements Cache {
 
   private void cycleKeyList(Object key) {
     keyMap.put(key, key);
+    //如果有值 需要进行删除
     if (eldestKey != null) {
       delegate.removeObject(eldestKey);
       eldestKey = null;
