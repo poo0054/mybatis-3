@@ -79,13 +79,13 @@ public class XNode {
         builder.insert(0, "_");
       }
       String value = current.getStringAttribute("id",
-          current.getStringAttribute("value",
-              current.getStringAttribute("property", (String) null)));
+        current.getStringAttribute("value",
+          current.getStringAttribute("property", (String) null)));
       if (value != null) {
         value = value.replace('.', '_');
         builder.insert(0, "]");
         builder.insert(0,
-            value);
+          value);
         builder.insert(0, "[");
       }
       builder.insert(0, current.getName());
@@ -176,7 +176,7 @@ public class XNode {
 
   public <T extends Enum<T>> T getEnumAttribute(Class<T> enumType, String name, T def) {
     String value = getStringAttribute(name);
-    return value == null ? def : Enum.valueOf(enumType,value);
+    return value == null ? def : Enum.valueOf(enumType, value);
   }
 
   /**
@@ -185,10 +185,8 @@ public class XNode {
    * <p>
    * If attribute value is absent, return value that provided from supplier of default value.
    *
-   * @param name
-   *          attribute name
-   * @param defSupplier
-   *          a supplier of default value
+   * @param name        attribute name
+   * @param defSupplier a supplier of default value
    * @return the string attribute
    * @since 3.5.4
    */
@@ -252,8 +250,11 @@ public class XNode {
   }
 
   public List<XNode> getChildren() {
+    //所有子节点封装
     List<XNode> children = new ArrayList<>();
+    //获取当前节点的所有子节点
     NodeList nodeList = node.getChildNodes();
+    //子节点不为空
     if (nodeList != null) {
       for (int i = 0, n = nodeList.getLength(); i < n; i++) {
         Node node = nodeList.item(i);
@@ -267,6 +268,7 @@ public class XNode {
 
   /**
    * 获取
+   *
    * @return
    */
   public Properties getChildrenAsProperties() {
@@ -334,6 +336,7 @@ public class XNode {
     if (attributeNodes != null) {
       for (int i = 0; i < attributeNodes.getLength(); i++) {
         Node attribute = attributeNodes.item(i);
+        //value 可以从一些properties文件中获取 如果是${}这种类型的
         String value = PropertyParser.parse(attribute.getNodeValue(), variables);
         attributes.put(attribute.getNodeName(), value);
       }
@@ -358,7 +361,7 @@ public class XNode {
 
   private String getBodyData(Node child) {
     if (child.getNodeType() == Node.CDATA_SECTION_NODE
-        || child.getNodeType() == Node.TEXT_NODE) {
+      || child.getNodeType() == Node.TEXT_NODE) {
       String data = ((CharacterData) child).getData();
       data = PropertyParser.parse(data, variables);
       return data;

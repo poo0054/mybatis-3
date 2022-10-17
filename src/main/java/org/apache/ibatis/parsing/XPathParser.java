@@ -231,6 +231,7 @@ public class XPathParser {
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      //是否校验dtd文档
       factory.setValidating(validation);
 
       factory.setNamespaceAware(false);
