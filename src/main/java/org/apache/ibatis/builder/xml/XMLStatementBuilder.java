@@ -53,6 +53,7 @@ public class XMLStatementBuilder extends BaseBuilder {
     String id = context.getStringAttribute("id");
     String databaseId = context.getStringAttribute("databaseId");
 
+    //如果databaseId不匹配 就跳过
     if (!databaseIdMatchesCurrent(id, databaseId, this.requiredDatabaseId)) {
       return;
     }
@@ -87,8 +88,8 @@ public class XMLStatementBuilder extends BaseBuilder {
       keyGenerator = configuration.getKeyGenerator(keyStatementId);
     } else {
       keyGenerator = context.getBooleanAttribute("useGeneratedKeys",
-          configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
-          ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
+        configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
+        ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
     }
 
     SqlSource sqlSource = langDriver.createSqlSource(configuration, context, parameterTypeClass);
@@ -109,9 +110,9 @@ public class XMLStatementBuilder extends BaseBuilder {
     String resultSets = context.getStringAttribute("resultSets");
 
     builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
-        fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass,
-        resultSetTypeEnum, flushCache, useCache, resultOrdered,
-        keyGenerator, keyProperty, keyColumn, databaseId, langDriver, resultSets);
+      fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass,
+      resultSetTypeEnum, flushCache, useCache, resultOrdered,
+      keyGenerator, keyProperty, keyColumn, databaseId, langDriver, resultSets);
   }
 
   private void processSelectKeyNodes(String id, Class<?> parameterTypeClass, LanguageDriver langDriver) {
@@ -156,9 +157,9 @@ public class XMLStatementBuilder extends BaseBuilder {
     SqlCommandType sqlCommandType = SqlCommandType.SELECT;
 
     builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
-        fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass,
-        resultSetTypeEnum, flushCache, useCache, resultOrdered,
-        keyGenerator, keyProperty, keyColumn, databaseId, langDriver, null);
+      fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass,
+      resultSetTypeEnum, flushCache, useCache, resultOrdered,
+      keyGenerator, keyProperty, keyColumn, databaseId, langDriver, null);
 
     id = builderAssistant.applyCurrentNamespace(id, false);
 

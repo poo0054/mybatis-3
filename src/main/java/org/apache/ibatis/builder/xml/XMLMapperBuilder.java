@@ -73,7 +73,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
-    // 是否已经加载过该配置文件
+    // 是否已经加载过该配置文件  所有加载过的配置文件 都会使用config进行储存
     if (!configuration.isResourceLoaded(resource)) {
       // 解析 <mapper>节点
       configurationElement(parser.evalNode("/mapper"));
@@ -102,19 +102,22 @@ public class XMLMapperBuilder extends BaseBuilder {
       if (namespace == null || namespace.isEmpty()) {
         throw new BuilderException("Mapper's namespace cannot be empty");
       }
-      // 使用 MapperBuilderAssistant对象 的 currentNamespace属性 记录 namespace命名空间
+
       builderAssistant.setCurrentNamespace(namespace);
 
       // 解析 <cache-ref>节点，后面的解析方法 也都见名知意 使用builderAssistant中的cache 对于另外一个namespace的cache
-      //其中有个是否解决 防止另外一个namespace未加载
+      //如果另外一个namespace为加载 就放入incompleteCacheRefs  需要等使用的时候 进行去加载这些未完成的cache-ref
       cacheRefElement(context.evalNode("cache-ref"));
+      //使用CacheBuilder创建cache
       cacheElement(context.evalNode("cache"));
+      //参数map解析
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+      //mysql结果映射
       resultMapElements(context.evalNodes("/mapper/resultMap"));
       //解析sql 还要解析多数据源的语言 -》 databaseId
       sqlElement(context.evalNodes("/mapper/sql"));
 
-      //注入config中
+      //解析
       buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
@@ -186,9 +189,12 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void cacheRefElement(XNode context) {
     if (context != null) {
+      // key：当前Namespace value：引用的Namespace
       configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
+      // context.getStringAttribute("namespace") 引用的namespace
       CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
       try {
+        //如果出现异常  就放入未完成的config中 等待下次使用session进行数据库操作的时候加载
         cacheRefResolver.resolveCacheRef();
       } catch (IncompleteElementException e) {
         configuration.addIncompleteCacheRef(cacheRefResolver);
@@ -253,7 +259,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings, Class<?> enclosingType) {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
-    // <resultMap> 的 id属性，默认值会拼装所有父节点的 id 或 value 或 property属性值
+    // type不存在就找ofType
     String type = resultMapNode.getStringAttribute("type",
       resultMapNode.getStringAttribute("ofType",
         resultMapNode.getStringAttribute("resultType",
@@ -282,7 +288,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         if ("id".equals(resultChild.getName())) {
           flags.add(ResultFlag.ID);
         }
-        // 创建 ResultMapping对象，并添加到 resultMappings集合
+        // 创建 ResultMapping对象，并添加到 resultMappings集合  每一行都会构建出一个resultMapping
         resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
       }
     }
@@ -386,17 +392,20 @@ public class XMLMapperBuilder extends BaseBuilder {
    * 根据上下文环境构建 ResultMapping
    */
   private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) {
-    // 获取各个节点的属性，见文知意
+    // java类型
     String property;
     if (flags.contains(ResultFlag.CONSTRUCTOR)) {
       property = context.getStringAttribute("name");
     } else {
       property = context.getStringAttribute("property");
     }
+    //mysql名称
     String column = context.getStringAttribute("column");
+    //java类型
     String javaType = context.getStringAttribute("javaType");
     String jdbcType = context.getStringAttribute("jdbcType");
     String nestedSelect = context.getStringAttribute("select");
+    //子嵌套
     String nestedResultMap = context.getStringAttribute("resultMap", () ->
       processNestedResultMappings(context, Collections.emptyList(), resultType));
     String notNullColumn = context.getStringAttribute("notNullColumn");

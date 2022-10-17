@@ -20,6 +20,12 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.poo0054.dao.SysUserDao">
 
+  <!--  <cache-ref namespace="test"/>-->
+
+  <!-- type 使用 mybatis的别名 可以是自定义的 也可以是mybatis原生的 或者全类名
+     eviction 与type同理 -->
+  <!--  <cache type="" size="1024"/>-->
+
   <resultMap type="com.poo0054.entity.SysUser" id="SysUserMap">
     <result property="id" column="id" jdbcType="INTEGER"/>
     <result property="loginname" column="loginName" jdbcType="VARCHAR"/>
