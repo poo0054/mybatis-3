@@ -94,7 +94,8 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
       // 根据事务对象tx和配置的Executor类型execType创建Executor实例
       // ExecutorType是个枚举类型，有三个值 SIMPLE, REUSE, BATCH，分别对应了
-      // SimpleExecutor、ReuseExecutor、BatchExecutor
+      // SimpleExecutor、ReuseExecutor、BatchExecutor  Plugin也在该地方进行初始化
+      // 并使用jdk的动态代理进行invok
       final Executor executor = configuration.newExecutor(tx, execType);
       // 创建DefaultSqlSession对象
       return new DefaultSqlSession(configuration, executor, autoCommit);

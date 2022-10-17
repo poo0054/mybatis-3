@@ -1,9 +1,14 @@
 package org.apache.ibatis.builder.xml;
 
 import com.poo0054.constant.FileConstant;
+import com.poo0054.dao.SysUserDao;
+import com.poo0054.entity.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author ZhangZhi
@@ -38,8 +44,15 @@ public class XMLConfigBuilderTest {
     /*
      核心代码 构建出全局唯一的Configuration
      */
-    Configuration parse = xmlConfigBuilder.parse();
+    Configuration config = xmlConfigBuilder.parse();
+    SqlSessionFactory defaultSqlSessionFactory = new DefaultSqlSessionFactory(config);
 
+    //构建
+    SqlSession sqlSession = defaultSqlSessionFactory.openSession();
+
+    SysUserDao roleMapper = sqlSession.getMapper(SysUserDao.class);
+    List<SysUser> sysUser = roleMapper.queryAllByLimit(new SysUser());
+    log.info(sysUser.toString());
   }
 
 }
