@@ -485,6 +485,7 @@ public class XMLConfigBuilder extends BaseBuilder {
               mapperParser.parse();
             }
           } else if (resource == null && url == null && mapperClass != null) {
+            // mapperClass 和 package 使用mapperRegistry构建
             // 如果 <mapper>节点 指定了 class属性，则向 MapperRegistry 注册 该Mapper接口
             Class<?> mapperInterface = Resources.classForName(mapperClass);
             configuration.addMapper(mapperInterface);

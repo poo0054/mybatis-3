@@ -16,8 +16,8 @@
 package org.apache.ibatis.session;
 
 import com.poo0054.constant.FileConstant;
-import com.poo0054.dao.SysUserDao;
-import com.poo0054.entity.SysUser;
+import com.poo0054.dao.TableDynamicDao;
+import com.poo0054.entity.TableDynamic;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,11 +58,11 @@ public class SqlSessionFactoryBuilderTest {
   }
 
   @Test
-  void queryUser() {
+  void queryAllByLimit() {
     //每次都是一个新的sqlSession
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      SysUserDao roleMapper = sqlSession.getMapper(SysUserDao.class);
-      List<SysUser> sysUser = roleMapper.queryAllByLimit(new SysUser());
+      TableDynamicDao roleMapper = sqlSession.getMapper(TableDynamicDao.class);
+      List<TableDynamic> sysUser = roleMapper.queryAllByLimit(new TableDynamic());
       log.info(sysUser.toString());
     }
   }

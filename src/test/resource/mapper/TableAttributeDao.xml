@@ -16,8 +16,10 @@
        limitations under the License.
 
 -->
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.poo0054.dao.TableAttributeDao">
+  <!--  "D:\project\source\mybatis-3\src\main\java\org\apache\ibatis\builder\xml\mybatis-3-mapper.dtd">-->
 
   <!-- eviction必须要有一个cache的构造方法 type需要有一个string的构造方法  -->
   <cache eviction="FIFO" type="PERPETUAL">
@@ -26,8 +28,19 @@
     <property name="password" value="${db.password}"/>
   </cache>
 
+  <!-- type 使用 mybatis的别名 可以是自定义的 也可以是mybatis原生的 或者全类名
+     eviction 与type同理 -->
+  <!--  <cache type="" size="1024"/>-->
 
+  <!--  extends="com.poo0054.dao.TableAttributeDao.TableAttributeMap" 是继承那个父类的属性 -->
   <resultMap type="com.poo0054.entity.TableAttribute" id="TableAttributeMap">
+    <!--   有参构造方法 -->
+    <constructor>
+      <idArg column="{id1=id},{w}=a" javaType="long" select="queryById"/>
+      <arg column="name" javaType="string"/>
+      <arg column="border" javaType="string"/>
+    </constructor>
+
     <result property="id" column="id" jdbcType="VARCHAR"/>
     <result property="tableCode" column="table_code" jdbcType="VARCHAR"/>
     <result property="name" column="name" jdbcType="VARCHAR"/>
@@ -36,6 +49,22 @@
     <result property="stripe" column="stripe" jdbcType="INTEGER"/>
     <result property="border" column="border" jdbcType="INTEGER"/>
     <result property="height" column="height" jdbcType="VARCHAR"/>
+
+    <!--    1对1  -->
+    <!--    <association property="companyadmin" />-->
+
+    <!--    条件查询 -->
+    <discriminator javaType="string" column="tableCode">
+      <case value="package">
+        <association property="tableCodes" column="{tableCode}=tableCode"
+                     select="com.poo0054.dao.TableDynamicDao.queryByTableCode"/>
+      </case>
+
+      <case value="storage">
+        <association property="tableCode" column="{tableCode1}=tableCode1" select="show1"/>
+      </case>
+    </discriminator>
+
   </resultMap>
 
   <!--查询单个-->

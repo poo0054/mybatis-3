@@ -16,8 +16,6 @@
 package org.apache.ibatis.builder.xml;
 
 import com.poo0054.constant.FileConstant;
-import com.poo0054.dao.TableAttributeDao;
-import com.poo0054.entity.TableAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
@@ -31,7 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * @author ZhangZhi
@@ -67,9 +64,9 @@ public class XMLConfigBuilderTest {
     //构建
     SqlSession sqlSession = defaultSqlSessionFactory.openSession();
 
-    TableAttributeDao roleMapper = sqlSession.getMapper(TableAttributeDao.class);
+   /* TableAttributeDao roleMapper = sqlSession.getMapper(TableAttributeDao.class);
     List<TableAttribute> tableAttributes = roleMapper.queryAllByLimit(new TableAttribute());
-    log.info(tableAttributes.toString());
+    log.info(tableAttributes.toString());*/
   }
 
 }

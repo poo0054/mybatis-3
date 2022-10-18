@@ -15,18 +15,18 @@
  */
 package com.poo0054.dao;
 
-import com.poo0054.entity.SysUser;
+import com.poo0054.entity.TableDynamic;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 /**
- * (SysUser)表数据库访问层
+ * 行属性(TableDynamic)表数据库访问层
  *
  * @author zhangzhi
- * @since 2022-07-15 15:45:55
+ * @since 2022-10-18 14:18:57
  */
-public interface SysUserDao {
+public interface TableDynamicDao {
 
   /**
    * 通过ID查询单条数据
@@ -34,57 +34,64 @@ public interface SysUserDao {
    * @param id 主键
    * @return 实例对象
    */
-  SysUser queryById(Long id);
+  TableDynamic queryById(String id);
+
+  /**
+   * 通过tableCode查询单条数据
+   *
+   * @param tableCode
+   * @return 实例对象
+   */
+  TableDynamic queryByTableCode(String tableCode);
 
   /**
    * 查询指定行数据
    *
-   * @param sysUser  查询条件
-   * @param pageable 分页对象
+   * @param tableDynamic 查询条件
+   * @param pageable     分页对象
    * @return 对象列表
    */
-  List<SysUser> queryAllByLimit(SysUser sysUser);
+  List<TableDynamic> queryAllByLimit(TableDynamic tableDynamic);
 
   /**
    * 统计总行数
    *
-   * @param sysUser 查询条件
+   * @param tableDynamic 查询条件
    * @return 总行数
    */
-  long count(SysUser sysUser);
+  long count(TableDynamic tableDynamic);
 
   /**
    * 新增数据
    *
-   * @param sysUser 实例对象
+   * @param tableDynamic 实例对象
    * @return 影响行数
    */
-  int insert(SysUser sysUser);
+  int insert(TableDynamic tableDynamic);
 
   /**
    * 批量新增数据（MyBatis原生foreach方法）
    *
-   * @param entities List<SysUser> 实例对象列表
+   * @param entities List<TableDynamic> 实例对象列表
    * @return 影响行数
    */
-  int insertBatch(@Param("entities") List<SysUser> entities);
+  int insertBatch(@Param("entities") List<TableDynamic> entities);
 
   /**
    * 批量新增或按主键更新数据（MyBatis原生foreach方法）
    *
-   * @param entities List<SysUser> 实例对象列表
+   * @param entities List<TableDynamic> 实例对象列表
    * @return 影响行数
-   * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入参
    */
-  int insertOrUpdateBatch(@Param("entities") List<SysUser> entities);
+  int insertOrUpdateBatch(@Param("entities") List<TableDynamic> entities);
 
   /**
    * 修改数据
    *
-   * @param sysUser 实例对象
+   * @param tableDynamic 实例对象
    * @return 影响行数
    */
-  int update(SysUser sysUser);
+  int update(TableDynamic tableDynamic);
 
   /**
    * 通过主键删除数据
@@ -92,7 +99,7 @@ public interface SysUserDao {
    * @param id 主键
    * @return 影响行数
    */
-  int deleteById(Long id);
+  int deleteById(String id);
 
 }
 

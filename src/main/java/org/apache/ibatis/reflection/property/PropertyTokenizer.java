@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,16 +18,34 @@ package org.apache.ibatis.reflection.property;
 import java.util.Iterator;
 
 /**
+ * 解析 . [ 的值
+ * 只解析一个[
+ *
  * @author Clinton Begin
  */
 public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
+  /**
+   * 有. ：.前面面的值  有 [ : [前面的值
+   * 没有. ： 完整值
+   */
   private String name;
+  /**
+   * 有. ：.前面面的值
+   * 没有. ： 完整值
+   */
   private final String indexedName;
+  /**
+   * [] 中的值
+   */
   private String index;
+  /**
+   * .后面的值 没有就为空
+   */
   private final String children;
 
   public PropertyTokenizer(String fullname) {
     int delim = fullname.indexOf('.');
+    //是否有 .
     if (delim > -1) {
       name = fullname.substring(0, delim);
       children = fullname.substring(delim + 1);
@@ -36,6 +54,7 @@ public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
       children = null;
     }
     indexedName = name;
+    //有 . ：找.店面的值是否存在 [   没有：找fullName
     delim = name.indexOf('[');
     if (delim > -1) {
       index = name.substring(delim + 1, name.length() - 1);

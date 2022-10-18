@@ -61,70 +61,9 @@ public class TableAttribute implements Serializable {
    */
   private String height;
 
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getTableCode() {
-    return tableCode;
-  }
-
-  public void setTableCode(String tableCode) {
-    this.tableCode = tableCode;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  public String getUrlType() {
-    return urlType;
-  }
-
-  public void setUrlType(String urlType) {
-    this.urlType = urlType;
-  }
-
-  public Integer getStripe() {
-    return stripe;
-  }
-
-  public void setStripe(Integer stripe) {
-    this.stripe = stripe;
-  }
-
-  public Integer getBorder() {
-    return border;
-  }
-
-  public void setBorder(Integer border) {
-    this.border = border;
-  }
-
-  public String getHeight() {
-    return height;
-  }
-
-  public void setHeight(String height) {
-    this.height = height;
-  }
-
+  /**
+   * 行属性
+   */
+  private TableDynamic tableCodes;
 }
 

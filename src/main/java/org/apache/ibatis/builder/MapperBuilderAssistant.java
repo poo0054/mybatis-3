@@ -133,6 +133,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
   public ParameterMap addParameterMap(String id, Class<?> parameterClass, List<ParameterMapping> parameterMappings) {
     id = applyCurrentNamespace(id, false);
     ParameterMap parameterMap = new ParameterMap.Builder(configuration, id, parameterClass, parameterMappings).build();
+    //添加全局配置
     configuration.addParameterMap(parameterMap);
     return parameterMap;
   }
@@ -146,10 +147,16 @@ public class MapperBuilderAssistant extends BaseBuilder {
     ParameterMode parameterMode,
     Class<? extends TypeHandler<?>> typeHandler,
     Integer numericScale) {
+
+    //获取resultMap名称 没有 . 就在前面加上namespace+.
     resultMap = applyCurrentNamespace(resultMap, true);
 
     // Class parameterType = parameterMapBuilder.type();
+
+    //获取java类型
     Class<?> javaTypeClass = resolveParameterJavaType(parameterType, property, javaType, jdbcType);
+
+    //获取类型处理器
     TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
 
     return new ParameterMapping.Builder(configuration, property, javaTypeClass)
@@ -158,6 +165,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
       .mode(parameterMode)
       .numericScale(numericScale)
       .typeHandler(typeHandlerInstance)
+      //构建
       .build();
   }
 
@@ -168,8 +176,10 @@ public class MapperBuilderAssistant extends BaseBuilder {
     Discriminator discriminator,
     List<ResultMapping> resultMappings,
     Boolean autoMapping) {
+
     // ResultMap 的 完整id 是 "namespace.id" 的格式
     id = applyCurrentNamespace(id, false);
+
     // 获取 父ResultMap 的 完整id
     extend = applyCurrentNamespace(extend, true);
 
@@ -184,8 +194,10 @@ public class MapperBuilderAssistant extends BaseBuilder {
       List<ResultMapping> extendedResultMappings = new ArrayList<>(resultMap.getResultMappings());
       // 删除需要覆盖的 ResultMapping集合
       extendedResultMappings.removeAll(resultMappings);
+
       // Remove parent constructor if this resultMap declares a constructor.
       //如果此resultMap声明了构造函数，请移除父构造函数。
+      //父类是否有构造方法  如果有就进行删除
       boolean declaresConstructor = false;
       for (ResultMapping resultMapping : resultMappings) {
         if (resultMapping.getFlags().contains(ResultFlag.CONSTRUCTOR)) {
@@ -193,6 +205,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
           break;
         }
       }
+      //是否删除父类的构造方法
       if (declaresConstructor) {
         extendedResultMappings.removeIf(resultMapping -> resultMapping.getFlags().contains(ResultFlag.CONSTRUCTOR));
       }
@@ -201,6 +214,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     }
     ResultMap resultMap = new ResultMap.Builder(configuration, id, type, resultMappings, autoMapping)
       .discriminator(discriminator)
+      //构建
       .build();
     configuration.addResultMap(resultMap);
     return resultMap;
@@ -400,12 +414,18 @@ public class MapperBuilderAssistant extends BaseBuilder {
     String resultSet,
     String foreignColumn,
     boolean lazy) {
+
+    //获取java类型  从resultType的set方法property 的属性
     Class<?> javaTypeClass = resolveResultJavaType(resultType, property, javaType);
+    //获取类型处理器
     TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
+
     List<ResultMapping> composites;
     if ((nestedSelect == null || nestedSelect.isEmpty()) && (foreignColumn == null || foreignColumn.isEmpty())) {
+      //nestedSelect 和 foreignColumn都为空
       composites = Collections.emptyList();
     } else {
+      //nestedSelect 和 foreignColumn只要有一个不为空
       composites = parseCompositeColumnName(column);
     }
     return new ResultMapping.Builder(configuration, property, column, javaTypeClass)
@@ -477,6 +497,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
 
   private List<ResultMapping> parseCompositeColumnName(String columnName) {
     List<ResultMapping> composites = new ArrayList<>();
+    //有 = 或者 ,
     if (columnName != null && (columnName.indexOf('=') > -1 || columnName.indexOf(',') > -1)) {
       StringTokenizer parser = new StringTokenizer(columnName, "{}=, ", false);
       while (parser.hasMoreTokens()) {
@@ -505,6 +526,9 @@ public class MapperBuilderAssistant extends BaseBuilder {
     return javaType;
   }
 
+  /**
+   * @param resultType parameterMap的type
+   */
   private Class<?> resolveParameterJavaType(Class<?> resultType, String property, Class<?> javaType, JdbcType jdbcType) {
     if (javaType == null) {
       if (JdbcType.CURSOR.equals(jdbcType)) {
@@ -512,6 +536,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
       } else if (Map.class.isAssignableFrom(resultType)) {
         javaType = Object.class;
       } else {
+        //根据ResultType的property 获取java类型
         MetaClass metaResultType = MetaClass.forClass(resultType, configuration.getReflectorFactory());
         javaType = metaResultType.getGetterType(property);
       }

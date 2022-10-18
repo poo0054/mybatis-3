@@ -35,6 +35,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -59,7 +61,6 @@ public class XMLMapperBuilderTest {
     XPathParser xPathParser = new XPathParser(inputStream);
     XNode xNode = xPathParser.evalNode("/configuration");
     mappers = xNode.evalNode("mappers");
-
   }
 
   @Test
@@ -74,7 +75,8 @@ public class XMLMapperBuilderTest {
         try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
           XPathParser mapperXml = new XPathParser(inputStream, true, configuration.getVariables(), new XMLMapperEntityResolver());
           xmlMapperBuilder = new XMLMapperBuilder(mapperXml, configuration, resource, configuration.getSqlFragments());
-          configurationElementTest(mapperXml);
+//          xmlMapperBuilder.parse();
+          configurationElement(mapperXml);
         }
       }
       //url和package使用mapperRegistry
@@ -86,7 +88,7 @@ public class XMLMapperBuilderTest {
     }
   }
 
-  void configurationElementTest(XPathParser mapperXml) {
+  void configurationElement(XPathParser mapperXml) {
     //解析
     XNode mapper = mapperXml.evalNode("/mapper");
     String namespace = mapper.getStringAttribute("namespace");
@@ -96,9 +98,21 @@ public class XMLMapperBuilderTest {
 
     //使用CacheBuilder创建cache
     cacheElement(mapper.evalNode("cache"));
+    //参数map解析
+    xmlMapperBuilder.parameterMapElement(mapper.evalNodes("/mapper/parameterMap"));
 
-
+    //resultMap 解析
+    List<XNode> xNodes = mapper.evalNodes("/mapper/resultMap");
+    for (XNode resultMapNode : xNodes) {
+      try {
+        //处理
+        xmlMapperBuilder.resultMapElement(resultMapNode, Collections.emptyList(), null);
+      } catch (IncompleteElementException e) {
+        // ignore, it will be retried
+      }
+    }
   }
+
 
   void cacheElement(XNode cacheNode) {
     if (cacheNode != null) {
@@ -134,5 +148,4 @@ public class XMLMapperBuilderTest {
       }
     }
   }
-
 }

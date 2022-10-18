@@ -239,7 +239,7 @@ public final class TypeHandlerRegistry {
     if (ParamMap.class.equals(type)) {
       return null;
     }
-    // Java数据类型 与 JDBC数据类型 的关系往往是一对多，
+    // Java数据类型 与 JDBC数据类型 的关系往往是多对一，
     // 所以一般会先根据 Java数据类型 获取 Map<JdbcType, TypeHandler<?>>对象
     // 再根据 JDBC数据类型 获取对应的 TypeHandler对象
     Map<JdbcType, TypeHandler<?>> jdbcHandlerMap = getJdbcHandlerMap(type);
@@ -247,10 +247,12 @@ public final class TypeHandlerRegistry {
     if (jdbcHandlerMap != null) {
       handler = jdbcHandlerMap.get(jdbcType);
       if (handler == null) {
+        //如果查询不到  就使用null的默认处理器
         handler = jdbcHandlerMap.get(null);
       }
       if (handler == null) {
         // #591
+        //使用
         handler = pickSoleHandler(jdbcHandlerMap);
       }
     }
@@ -265,14 +267,18 @@ public final class TypeHandlerRegistry {
     }
     if (type instanceof Class) {
       Class<?> clazz = (Class<?>) type;
+      //是否为枚举
       if (Enum.class.isAssignableFrom(clazz)) {
+        //是否为匿名类
         Class<?> enumClass = clazz.isAnonymousClass() ? clazz.getSuperclass() : clazz;
         jdbcHandlerMap = getJdbcHandlerMapForEnumInterfaces(enumClass, enumClass);
         if (jdbcHandlerMap == null) {
+          //获取枚举处理类
           register(enumClass, getInstance(enumClass, defaultEnumTypeHandler));
           return typeHandlerMap.get(enumClass);
         }
       } else {
+        //不是就寻找父类
         jdbcHandlerMap = getJdbcHandlerMapForSuperclass(clazz);
       }
     }
@@ -318,6 +324,7 @@ public final class TypeHandlerRegistry {
       if (soleHandler == null) {
         soleHandler = handler;
       } else if (!handler.getClass().equals(soleHandler.getClass())) {
+        //注册了多个类型处理程序。 不知道使用哪个  返回空
         // More than one type handlers registered.
         return null;
       }
