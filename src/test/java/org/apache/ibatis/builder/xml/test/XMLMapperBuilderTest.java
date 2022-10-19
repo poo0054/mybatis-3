@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.builder.xml;
+package org.apache.ibatis.builder.xml.test;
 
 import com.poo0054.constant.FileConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.CacheRefResolver;
 import org.apache.ibatis.builder.IncompleteElementException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
-import org.apache.ibatis.builder.xml.test.XMLMapperBuilder;
+import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.parsing.XNode;
