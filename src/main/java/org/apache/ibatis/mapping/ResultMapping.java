@@ -65,11 +65,17 @@ public class ResultMapping {
    */
   private String nestedQueryId;
   private Set<String> notNullColumns;
+  /**
+   * 前缀
+   */
   private String columnPrefix;
   /**
    * 处理后的标志，共有两个：id 和 constructor
    */
   private List<ResultFlag> flags;
+  /**
+   * 其中的一些特殊字符串解析后的值
+   */
   private List<ResultMapping> composites;
   private String resultSet;
   private String foreignColumn;

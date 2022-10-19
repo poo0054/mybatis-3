@@ -286,7 +286,6 @@ public class XMLMapperBuilder extends BaseBuilder {
         processConstructorElement(resultChild, typeClass, resultMappings);
         // 处理 <discriminator>节点 可以进行判断的节点+
       } else if ("discriminator".equals(resultChild.getName())) {
-        // todo 构建 discriminator 的 ResultMapping
         discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
       } else {
         //   处理 <id>, <result>, <association>, <collection> 等节点
@@ -299,6 +298,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       }
 
     }
+    ///获取当前标签的id
     String id = resultMapNode.getStringAttribute("id",
       resultMapNode.getValueBasedIdentifier());
 
@@ -357,6 +357,14 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * discriminator 条件查询
+   *
+   * @param context
+   * @param resultType
+   * @param resultMappings
+   * @return
+   */
   private Discriminator processDiscriminatorElement(XNode context, Class<?> resultType, List<ResultMapping> resultMappings) {
     String column = context.getStringAttribute("column");
     String javaType = context.getStringAttribute("javaType");
@@ -365,6 +373,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     //获取java类型
     Class<?> javaTypeClass = resolveClass(javaType);
+    //类型处理器
     Class<? extends TypeHandler<?>> typeHandlerClass = resolveClass(typeHandler);
     JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
 
@@ -433,9 +442,12 @@ public class XMLMapperBuilder extends BaseBuilder {
     String nestedSelect = context.getStringAttribute("select");
     //子嵌套
     String nestedResultMap = context.getStringAttribute("resultMap",
+      //constructor中不存在
       () -> processNestedResultMappings(context, Collections.emptyList(), resultType));
     String notNullColumn = context.getStringAttribute("notNullColumn");
+    //前缀
     String columnPrefix = context.getStringAttribute("columnPrefix");
+    //类型处理器
     String typeHandler = context.getStringAttribute("typeHandler");
     String resultSet = context.getStringAttribute("resultSet");
     String foreignColumn = context.getStringAttribute("foreignColumn");
