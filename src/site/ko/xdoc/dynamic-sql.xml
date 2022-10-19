@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-       Copyright 2009-2021 the original author or authors.
+       Copyright 2009-2022 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
        You may obtain a copy of the License at
 
-          http://www.apache.org/licenses/LICENSE-2.0
+          https://www.apache.org/licenses/LICENSE-2.0
 
        Unless required by applicable law or agreed to in writing, software
        distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,7 @@
 
 -->
 <document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+          xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 https://maven.apache.org/xsd/xdoc-2.0.xsd">
 
   <properties>
     <title>마이바티스 3 | 동적 SQL</title>
@@ -190,7 +190,8 @@ AND title like ‘someTitle’]]></source>
         <p>XML설정 파일과 XML 매핑 파일에 대해서는 이 정도에서 정리하고 다음 섹션에서는 Java API 에 대해 좀더 상세하게 살펴볼 것이다.</p>
       </subsection>
   <subsection name="script">
-  <p>For using dynamic SQL in annotated mapper class, <em>script</em> element can be used. For example:</p>
+    <p>애노테이션을 사용한 매퍼 클래스에서 동적 SQL을 사용하는 경우 <em>script</em> 태그를 사용할 수 있다. 예를 들어:
+    </p>
   <source><![CDATA[
     @Update({"<script>",
       "update Author",

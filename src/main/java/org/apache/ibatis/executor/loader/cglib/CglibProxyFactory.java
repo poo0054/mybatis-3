@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,21 +15,11 @@
  */
 package org.apache.ibatis.executor.loader.cglib;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-
-import org.apache.ibatis.executor.loader.AbstractEnhancedDeserializationProxy;
-import org.apache.ibatis.executor.loader.AbstractSerialStateHolder;
-import org.apache.ibatis.executor.loader.ProxyFactory;
-import org.apache.ibatis.executor.loader.ResultLoaderMap;
-import org.apache.ibatis.executor.loader.WriteReplaceInterface;
+import org.apache.ibatis.executor.loader.*;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -38,6 +28,11 @@ import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyCopier;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 import org.apache.ibatis.session.Configuration;
+
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Clinton Begin
@@ -66,7 +61,7 @@ public class CglibProxyFactory implements ProxyFactory {
     return EnhancedDeserializationProxyImpl.createProxy(target, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);
   }
 
-  static Object crateProxy(Class<?> type, Callback callback, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+  static Object createStaticProxy(Class<?> type, Callback callback, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
     LogHolder.log.warn("CglibProxyFactory is deprecated. Use another proxy factory implementation.");
     Enhancer enhancer = new Enhancer();
     enhancer.setCallback(callback);
@@ -116,7 +111,7 @@ public class CglibProxyFactory implements ProxyFactory {
     public static Object createProxy(Object target, ResultLoaderMap lazyLoader, Configuration configuration, ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
       final Class<?> type = target.getClass();
       EnhancedResultObjectProxyImpl callback = new EnhancedResultObjectProxyImpl(type, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);
-      Object enhanced = crateProxy(type, callback, constructorArgTypes, constructorArgs);
+      Object enhanced = createStaticProxy(type, callback, constructorArgTypes, constructorArgs);
       PropertyCopier.copyBeanProperties(type, target, enhanced);
       return enhanced;
     }
@@ -173,7 +168,7 @@ public class CglibProxyFactory implements ProxyFactory {
             List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
       final Class<?> type = target.getClass();
       EnhancedDeserializationProxyImpl callback = new EnhancedDeserializationProxyImpl(type, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);
-      Object enhanced = crateProxy(type, callback, constructorArgTypes, constructorArgs);
+      Object enhanced = createStaticProxy(type, callback, constructorArgTypes, constructorArgs);
       PropertyCopier.copyBeanProperties(type, target, enhanced);
       return enhanced;
     }

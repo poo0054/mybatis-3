@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-       Copyright 2009-2020 the original author or authors.
+       Copyright 2009-2022 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
        You may obtain a copy of the License at
 
-          http://www.apache.org/licenses/LICENSE-2.0
+          https://www.apache.org/licenses/LICENSE-2.0
 
        Unless required by applicable law or agreed to in writing, software
        distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,7 @@
 
 -->
 <document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+          xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 https://maven.apache.org/xsd/xdoc-2.0.xsd">
 
   <properties>
     <title>MyBatis 3 | Java API</title>
@@ -26,8 +26,12 @@
   </properties>
 
   <body>
-  <section name="Java API" id="javaApi">
-  <p>Ahora que ya conoces cómo configurar MyBatis y crear mapeos estás listo para lo mejor. El API Java es donde obtendrás los mejores frutos de tus esfuerzos. Como verás, comparado con JDBC, MyBatis simplifica enormemente tu código y lo mantiene limpio, de fácil comprensión y mantenimiento. MyBatis 3 incorpora muchas mejoras significativas para hacer que el trabajo con SQL Maps sea aun mejor.</p>
+    <section name="Java API" id="javaApi">
+      <p>Ahora que ya conoces cómo configurar MyBatis y crear mapeos estás listo para lo mejor. El API Java es donde
+        obtendrás los mejores frutos de tus esfuerzos. Como verás, comparado con JDBC, MyBatis simplifica enormemente tu
+        código y lo mantiene limpio, de fácil comprensión y mantenimiento. MyBatis 3 incorpora muchas mejoras
+        significativas para hacer que el trabajo con SQL Maps sea aun mejor.
+      </p>
 
   <subsection name="Directory Structure" id="directoryStructure">
   <p>Antes de zambullirnos en el propio API Java , es importante comprender las mejores prácticas relativas a la estructura de directorios. MyBatis es muy flexible, y puedes hacer casi cualquier cosa con tus ficheros. Pero como en cualquier otro framework, hay una forma recomendable.</p>

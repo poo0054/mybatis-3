@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,23 +14,6 @@
  *    limitations under the License.
  */
 package org.apache.ibatis.executor.resultset;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Parameter;
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import org.apache.ibatis.annotations.AutomapConstructor;
 import org.apache.ibatis.annotations.Param;
@@ -47,26 +30,25 @@ import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.result.DefaultResultContext;
 import org.apache.ibatis.executor.result.DefaultResultHandler;
 import org.apache.ibatis.executor.result.ResultMapException;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.Discriminator;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.mapping.ParameterMode;
-import org.apache.ibatis.mapping.ResultMap;
-import org.apache.ibatis.mapping.ResultMapping;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
-import org.apache.ibatis.session.AutoMappingBehavior;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.ResultContext;
-import org.apache.ibatis.session.ResultHandler;
-import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.*;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.apache.ibatis.util.MapUtil;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.MessageFormat;
+import java.util.*;
 
 /**
  * @author Clinton Begin
@@ -710,17 +692,19 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     if (constructors.length == 1) {
       return Optional.of(constructors[0]);
     }
-    for (final Constructor<?> constructor : constructors) {
-      if (constructor.isAnnotationPresent(AutomapConstructor.class)) {
-        return Optional.of(constructor);
-      }
-    }
-    if (configuration.isArgNameBasedConstructorAutoMapping()) {
+    Optional<Constructor<?>> annotated = Arrays.stream(constructors)
+      .filter(x -> x.isAnnotationPresent(AutomapConstructor.class))
+      .reduce((x, y) -> {
+        throw new ExecutorException("@AutomapConstructor should be used in only one constructor.");
+      });
+    if (annotated.isPresent()) {
+      return annotated;
+    } else if (configuration.isArgNameBasedConstructorAutoMapping()) {
       // Finding-best-match type implementation is possible,
       // but using @AutomapConstructor seems sufficient.
       throw new ExecutorException(MessageFormat.format(
-          "'argNameBasedConstructorAutoMapping' is enabled and the class ''{0}'' has multiple constructors, so @AutomapConstructor must be added to one of the constructors.",
-          resultType.getName()));
+        "'argNameBasedConstructorAutoMapping' is enabled and the class ''{0}'' has multiple constructors, so @AutomapConstructor must be added to one of the constructors.",
+        resultType.getName()));
     } else {
       return Arrays.stream(constructors).filter(x -> findUsableConstructorByArgTypes(x, rsw.getJdbcTypes())).findAny();
     }
@@ -743,12 +727,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     boolean foundValues = false;
     if (configuration.isArgNameBasedConstructorAutoMapping()) {
       foundValues = applyArgNameBasedConstructorAutoMapping(rsw, resultMap, columnPrefix, resultType, constructorArgTypes, constructorArgs,
-          constructor, foundValues);
+        constructor, foundValues);
     } else {
       foundValues = applyColumnOrderBasedConstructorAutomapping(rsw, constructorArgTypes, constructorArgs, constructor,
-          foundValues);
+        foundValues);
     }
-    return foundValues ? objectFactory.create(resultType, constructorArgTypes, constructorArgs) : null;
+    return foundValues || configuration.isReturnInstanceForEmptyRow()
+      ? objectFactory.create(resultType, constructorArgTypes, constructorArgs)
+      : null;
   }
 
   private boolean applyColumnOrderBasedConstructorAutomapping(ResultSetWrapper rsw, List<Class<?>> constructorArgTypes,
