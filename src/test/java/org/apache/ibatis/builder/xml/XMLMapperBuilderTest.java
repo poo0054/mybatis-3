@@ -79,7 +79,7 @@ public class XMLMapperBuilderTest {
           configurationElement(mapperXml);
         }
       }
-      //url和package使用mapperRegistry
+      //mapperClass和package使用mapperRegistry
       if (StringUtils.isNotEmpty(mapperClass)) {
         // 如果 <mapper>节点 指定了 class属性，则向 MapperRegistry 注册 该Mapper接口
         Class<?> mapperInterface = Resources.classForName(mapperClass);
