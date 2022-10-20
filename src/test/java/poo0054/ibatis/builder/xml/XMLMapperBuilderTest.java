@@ -15,16 +15,15 @@
  */
 package poo0054.ibatis.builder.xml;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.parsing.XNode;
-import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 import org.junit.Before;
 import org.junit.Test;
-import poo0054.constant.FileConstant;
+import poo0054.SimpleBuildUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,19 +36,15 @@ import java.io.InputStream;
 @Slf4j
 public class XMLMapperBuilderTest {
 
-    private InputStream inputStream;
     private Configuration configuration;
-    XNode mappers;
     XMLMapperBuilder xmlMapperBuilder;
+    XNode mappers;
 
     @Before
     public void before() throws IOException {
-        this.inputStream = Resources.getResourceAsStream(FileConstant.mybatisConfig);
-        configuration = new Configuration();
-        configuration.setVariables(Resources.getResourceAsProperties("db.properties"));
-        XPathParser xPathParser = new XPathParser(inputStream);
-        XNode xNode = xPathParser.evalNode("/configuration");
-        mappers = xNode.evalNode("mappers");
+        configuration = SimpleBuildUtils.buildConfiguration();
+        configuration.setVariables(SimpleBuildUtils.getVariables());
+        mappers = SimpleBuildUtils.buildConfigXpath().evalNode("/configuration/mappers");
     }
 
     @Test
@@ -62,14 +57,14 @@ public class XMLMapperBuilderTest {
             String mapperClass = child.getStringAttribute("class");
 
             //url和resource使用XMLMapperBuilder
-            if (StringUtils.isNotEmpty(resource)) {
+            if (StrUtil.isNotEmpty(resource)) {
                 try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
                     xmlMapperBuilder = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
                     xmlMapperBuilder.parse();
                 }
             }
             //mapperClass和package使用mapperRegistry
-            if (StringUtils.isNotEmpty(mapperClass)) {
+            if (StrUtil.isNotEmpty(mapperClass)) {
                 // 如果 <mapper>节点 指定了 class属性，则向 MapperRegistry 注册 该Mapper接口
                 Class<?> mapperInterface = Resources.classForName(mapperClass);
                 configuration.addMapper(mapperInterface);

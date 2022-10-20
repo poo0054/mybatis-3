@@ -18,7 +18,7 @@
 -->
 <!DOCTYPE configuration
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
-        "D:\project\source\mybatis-3\src\main\java\org\apache\ibatis\builder\xml\mybatis-3-config.dtd">
+        "D:\project\source\mybatis-study\src\main\java\org\apache\ibatis\builder\xml\mybatis-3-config.dtd">
 <configuration>
 
     <properties resource="resources/db.properties">

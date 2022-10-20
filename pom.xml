@@ -145,6 +145,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.5.9</version>
+        </dependency>
+
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.30</version>
@@ -154,6 +160,7 @@
             <artifactId>lombok</artifactId>
             <version>1.18.24</version>
         </dependency>
+
         <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
