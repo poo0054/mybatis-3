@@ -15,7 +15,8 @@
  */
 package poo0054.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -25,13 +26,14 @@ import java.io.Serializable;
  * @author zhangzhi
  * @since 2022-10-17 16:45:33
  */
-@Data
+@Getter
+@Setter
 public class TableAttribute implements Serializable {
     private static final long serialVersionUID = -43176302154601050L;
     /**
      * 主键
      */
-    private String id;
+    private String id1;
     /**
      * 表类型
      */
@@ -65,5 +67,26 @@ public class TableAttribute implements Serializable {
      * 行属性
      */
     private TableDynamic tableCodes;
+
+    public TableAttribute(String id1, String name, Integer border) {
+        this.id1 = id1;
+        this.name = name;
+        this.border = border;
+    }
+
+    @Override
+    public String toString() {
+        return "TableAttribute{" +
+                "id1='" + id1 + '\'' +
+                ", tableCode='" + tableCode + '\'' +
+                ", name='" + name + '\'' +
+                ", url='" + url + '\'' +
+                ", urlType='" + urlType + '\'' +
+                ", stripe=" + stripe +
+                ", border=" + border +
+                ", height='" + height + '\'' +
+                ", tableCodes=" + tableCodes +
+                '}';
+    }
 }
 

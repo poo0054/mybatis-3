@@ -36,40 +36,52 @@
     <resultMap type="poo0054.entity.TableAttribute" id="TableAttributeMap">
         <!--   有参构造方法 -->
         <constructor>
-            <idArg column="{id1=id},{w}=a" javaType="long" select="queryById"/>
+            <arg column="id" javaType="string"/>
             <arg column="name" javaType="string"/>
-            <arg column="border" javaType="string"/>
+            <arg column="border" javaType="INTEGER"/>
         </constructor>
-
-        <result property="id" column="id" javaType="string" jdbcType="VARCHAR"/>
+        <!--        <result property="id1" column="id" javaType="string" jdbcType="VARCHAR"/>-->
         <result property="tableCode" column="table_code" jdbcType="VARCHAR"/>
-        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <!--        <result property="name" column="name" jdbcType="VARCHAR"/>-->
         <result property="url" column="url" jdbcType="VARCHAR"/>
         <result property="urlType" column="url_type" jdbcType="VARCHAR"/>
         <result property="stripe" column="stripe" jdbcType="INTEGER"/>
-        <result property="border" column="border" jdbcType="INTEGER"/>
+        <!--        <result property="border" column="border" jdbcType="INTEGER"/>-->
         <result property="height" column="height" jdbcType="VARCHAR"/>
-
         <!--    1对1  -->
         <!--    <association property="companyadmin" />-->
-
         <!--    条件查询 -->
-        <discriminator javaType="string" column="tableCode">
-            <case value="package">
-                <association property="tableCodes" column="{tableCode}=tableCode"
+        <discriminator javaType="string" column="table_code">
+            <case value="package" resultType="poo0054.entity.TableDynamic">
+                <association property="tableCodes" column="{table_code}=tableCode"
+                             javaType="poo0054.entity.TableDynamic"
                              select="poo0054.dao.TableDynamicDao.queryByTableCode"/>
             </case>
 
-            <case value="storage">
-                <association property="tableCode" column="{tableCode1}=tableCode1" select="show1"/>
+            <case value="storage" resultType="poo0054.entity.TableDynamic">
+                <association property="id1" column="{id}=id1"
+                             javaType="poo0054.dao.TableDynamicDao"
+                             select="poo0054.dao.TableDynamicDao.queryById"/>
             </case>
         </discriminator>
     </resultMap>
 
+    <!-- <resultMap type="poo0054.entity.TableAttribute" id="CopyTableAttributeMap">
+         <result property="id" column="id" javaType="string" jdbcType="VARCHAR"/>
+         <result property="tableCode" column="table_code" jdbcType="VARCHAR"/>
+         <result property="name" column="name" jdbcType="VARCHAR"/>
+         <result property="url" column="url" jdbcType="VARCHAR"/>
+         <result property="urlType" column="url_type" jdbcType="VARCHAR"/>
+         <result property="stripe" column="stripe" jdbcType="INTEGER"/>
+         <result property="border" column="border" jdbcType="INTEGER"/>
+         <result property="height" column="height" jdbcType="VARCHAR"/>
+     </resultMap>-->
+
     <parameterMap id="parmeterSysUser" type="poo0054.entity.TableAttribute">
-        <parameter property="id" javaType="string" jdbcType="VARCHAR"/>
+        <parameter property="id1" javaType="string" jdbcType="VARCHAR"/>
         <parameter property="tableCode" javaType="string" jdbcType="VARCHAR"/>
     </parameterMap>
+
     <!--查询单个-->
     <select id="queryById" resultMap="TableAttributeMap">
         select id,
@@ -90,8 +102,8 @@
         id, table_code, name, url, url_type, stripe, border, height
         from table_attribute
         <where>
-            <if test="id != null and id != ''">
-                and id = #{id}
+            <if test="id1 != null and id1 != ''">
+                and id = #{id1}
             </if>
             <if test="tableCode != null and tableCode != ''">
                 and table_code = #{tableCode}

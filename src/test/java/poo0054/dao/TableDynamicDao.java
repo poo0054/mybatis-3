@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package poo0054.dao;
 
+package poo0054.dao;
 import org.apache.ibatis.annotations.Param;
 import poo0054.entity.TableDynamic;
 

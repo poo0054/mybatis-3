@@ -23,8 +23,8 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import poo0054.constant.FileConstant;
-import poo0054.dao.TableDynamicDao;
-import poo0054.entity.TableDynamic;
+import poo0054.dao.TableAttributeDao;
+import poo0054.entity.TableAttribute;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,8 +61,8 @@ public class SqlSessionFactoryBuilderTest {
     public void queryAllByLimit() {
         //每次都是一个新的sqlSession
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-            TableDynamicDao roleMapper = sqlSession.getMapper(TableDynamicDao.class);
-            List<TableDynamic> sysUser = roleMapper.queryAllByLimit(new TableDynamic());
+            TableAttributeDao roleMapper = sqlSession.getMapper(TableAttributeDao.class);
+            List<TableAttribute> sysUser = roleMapper.queryAllByLimit(new TableAttribute(null, null, null));
             log.info(sysUser.toString());
         }
     }

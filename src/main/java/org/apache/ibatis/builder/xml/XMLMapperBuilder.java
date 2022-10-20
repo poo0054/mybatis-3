@@ -35,9 +35,19 @@ import java.util.*;
  */
 public class XMLMapperBuilder extends BaseBuilder {
 
+    /**
+     * 当前mapper 的xpath
+     */
     private final XPathParser parser;
+
+    /**
+     * mapper 构建存放一些公告参数
+     */
     private final MapperBuilderAssistant builderAssistant;
     private final Map<String, XNode> sqlFragments;
+    /**
+     * 当前路径
+     */
     private final String resource;
 
     @Deprecated
@@ -76,6 +86,7 @@ public class XMLMapperBuilder extends BaseBuilder {
             configurationElement(parser.evalNode("/mapper"));
             //加载过的文件需要添加如config
             configuration.addLoadedResource(resource);
+
             bindMapperForNamespace();
         }
 
@@ -239,6 +250,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings) throws Exception {
         ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
+        //id不存在就
         String id = resultMapNode.getStringAttribute("id",
                 resultMapNode.getValueBasedIdentifier());
         String type = resultMapNode.getStringAttribute("type",
@@ -249,13 +261,17 @@ public class XMLMapperBuilder extends BaseBuilder {
         Boolean autoMapping = resultMapNode.getBooleanAttribute("autoMapping");
         Class<?> typeClass = resolveClass(type);
         Discriminator discriminator = null;
+        //在同一个 resultMap 中数据是一致
         List<ResultMapping> resultMappings = new ArrayList<ResultMapping>();
         resultMappings.addAll(additionalResultMappings);
+        //map的所有子类
         List<XNode> resultChildren = resultMapNode.getChildren();
         for (XNode resultChild : resultChildren) {
             if ("constructor".equals(resultChild.getName())) {
+                //构建有参构造方法 并添加入 resultMappings
                 processConstructorElement(resultChild, typeClass, resultMappings);
             } else if ("discriminator".equals(resultChild.getName())) {
+                //条件 鉴别器
                 discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
             } else {
                 List<ResultFlag> flags = new ArrayList<ResultFlag>();
@@ -275,13 +291,17 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
 
     private void processConstructorElement(XNode resultChild, Class<?> resultType, List<ResultMapping> resultMappings) throws Exception {
+        // <constructor> 的子节点
         List<XNode> argChildren = resultChild.getChildren();
+        //每一行都会构建成一个 ResultMapping
         for (XNode argChild : argChildren) {
             List<ResultFlag> flags = new ArrayList<ResultFlag>();
             flags.add(ResultFlag.CONSTRUCTOR);
+            //如果有idArg就添加
             if ("idArg".equals(argChild.getName())) {
                 flags.add(ResultFlag.ID);
             }
+            //每个子节点都会构建成一个resultMappings
             resultMappings.add(buildResultMappingFromContext(argChild, resultType, flags));
         }
     }
@@ -296,6 +316,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
         JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
         Map<String, String> discriminatorMap = new HashMap<String, String>();
+        //循环case
         for (XNode caseChild : context.getChildren()) {
             String value = caseChild.getStringAttribute("value");
             String resultMap = caseChild.getStringAttribute("resultMap", processNestedResultMappings(caseChild, resultMappings));
@@ -344,6 +365,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) throws Exception {
         String property;
+        //如果是构造方法
         if (flags.contains(ResultFlag.CONSTRUCTOR)) {
             property = context.getStringAttribute("name");
         } else {
@@ -353,7 +375,9 @@ public class XMLMapperBuilder extends BaseBuilder {
         String javaType = context.getStringAttribute("javaType");
         String jdbcType = context.getStringAttribute("jdbcType");
         String nestedSelect = context.getStringAttribute("select");
+        //如果不存在就进入processNestedResultMappings
         String nestedResultMap = context.getStringAttribute("resultMap",
+                //构建嵌套的ResultMappings  返回id
                 processNestedResultMappings(context, Collections.<ResultMapping>emptyList()));
         String notNullColumn = context.getStringAttribute("notNullColumn");
         String columnPrefix = context.getStringAttribute("columnPrefix");
@@ -368,11 +392,22 @@ public class XMLMapperBuilder extends BaseBuilder {
         return builderAssistant.buildResultMapping(resultType, property, column, javaTypeClass, jdbcTypeEnum, nestedSelect, nestedResultMap, notNullColumn, columnPrefix, typeHandlerClass, flags, resultSet, foreignColumn, lazy);
     }
 
+    /**
+     * 构建嵌套的 节点 并返回id
+     *
+     * @param context        当前标签
+     * @param resultMappings 所有 resultMappings
+     * @return ResultMap的id
+     * @throws Exception
+     */
     private String processNestedResultMappings(XNode context, List<ResultMapping> resultMappings) throws Exception {
+        //都会构建成一个个 resultMap
         if ("association".equals(context.getName())
                 || "collection".equals(context.getName())
                 || "case".equals(context.getName())) {
+            // 并且没有select标签 返回构建好的 ResultMap id
             if (context.getStringAttribute("select") == null) {
+                //用以上三种标签的构建成一个新的 resultMap 并返回id
                 ResultMap resultMap = resultMapElement(context, resultMappings);
                 return resultMap.getId();
             }
