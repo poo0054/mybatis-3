@@ -21,9 +21,10 @@
         "D:\project\source\mybatis-3\src\main\java\org\apache\ibatis\builder\xml\mybatis-3-config.dtd">
 <configuration>
 
-    <properties resource="db.properties">
+    <properties resource="resources/db.properties">
         <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
     </properties>
+
     <settings>
         <!--    全局性地开启或关闭所有映射器配置文件中已配置的任何缓存。-->
         <setting name="cacheEnabled" value="true"/>
@@ -98,12 +99,12 @@
     </settings>
 
     <typeAliases>
-        <package name="com.poo0054.entity"/>
+        <package name="poo0054.entity"/>
     </typeAliases>
 
     <!-- mybatis-config.xml -->
     <typeHandlers>
-        <typeHandler handler="com.poo0054.example.ExampleTypeHandler"/>
+        <typeHandler handler="poo0054.example.ExampleTypeHandler"/>
         <typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler" javaType="java.math.RoundingMode"/>
     </typeHandlers>
 
@@ -111,18 +112,18 @@
      每次 MyBatis 创建结果对象的新实例时，它都会使用一个对象工厂（ObjectFactory）实例来完成实例化工作。
      默认的对象工厂需要做的仅仅是实例化目标类，要么通过默认无参构造方法，要么通过存在的参数映射来调用带有参数的构造方法。
       如果想覆盖对象工厂的默认行为，可以通过创建自己的对象工厂来实现。-->
-    <objectFactory type="com.poo0054.example.ExampleObjectFactory">
+    <objectFactory type="poo0054.example.ExampleObjectFactory">
         <property name="someProperty" value="100"/>
     </objectFactory>
 
-    <!--  用来创建ObjectWrapper -->
-    <objectWrapperFactory type="com.poo0054.mybatisFactory.CustomObjectWrapperFactory"/>
+    <!--   &lt;!&ndash;  用来创建ObjectWrapper &ndash;&gt;
+       <objectWrapperFactory type="poo0054.mybatisFactory.CustomObjectWrapperFactory"/>
 
-    <reflectorFactory type="com.poo0054.mybatisFactory.CustomReflectoryFactory"/>
+       <reflectorFactory type="poo0054.mybatisFactory.CustomReflectoryFactory"/>-->
 
     <!-- mybatis-config.xml -->
     <plugins>
-        <plugin interceptor="com.poo0054.example.ExamplePlugin">
+        <plugin interceptor="poo0054.example.ExamplePlugin">
             <property name="someProperty" value="100"/>
         </plugin>
     </plugins>
@@ -160,12 +161,12 @@
 
     <mappers>
         <!--    resource 和 url 是走一个资源解析 - XMLMapperBuilder -->
-        <mapper resource="mapper/TableAttributeDao.xml"/>
-        <mapper resource="mapper/TableDynamicDao.xml"/>
+        <mapper resource="resources/mapper/TableAttributeDao.xml"/>
+        <mapper resource="resources/mapper/TableDynamicDao.xml"/>
         <!--    <mapper url="mapper/SysUserDao.xml"/>-->
 
         <!-- mapper和package是直接使用mapperRegistry进行注册   -->
-        <!--    <package name="com.poo0054.dao"/>-->
+        <!--    <package name="poo0054.dao"/>-->
         <!--    <mapper class=" "/>-->
     </mappers>
 

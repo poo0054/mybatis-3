@@ -21,7 +21,7 @@
 <mapper namespace="poo0054.dao.TableDynamicDao">
     <!--  "D:\project\source\mybatis-3\src\main\java\org\apache\ibatis\builder\xml\mybatis-3-mapper.dtd">-->
 
-    <cache-ref namespace="com.poo0054.dao.TableAttributeDao"/>
+    <cache-ref namespace="poo0054.dao.TableAttributeDao"/>
 
     <resultMap type="poo0054.entity.TableDynamic" id="TableDynamicMap">
         <result property="id" column="id" jdbcType="VARCHAR"/>
