@@ -63,7 +63,9 @@ public class SqlSessionFactoryBuilderTest {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             TableAttributeDao roleMapper = sqlSession.getMapper(TableAttributeDao.class);
             List<TableAttribute> sysUser = roleMapper.queryAllByLimit(new TableAttribute(null, null, null));
-            log.info(sysUser.toString());
+            for (TableAttribute tableAttribute : sysUser) {
+                System.out.println(tableAttribute);
+            }
         }
     }
 

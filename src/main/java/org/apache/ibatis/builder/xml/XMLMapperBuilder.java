@@ -109,6 +109,7 @@ public class XMLMapperBuilder extends BaseBuilder {
             cacheRefElement(context.evalNode("cache-ref"));
             cacheElement(context.evalNode("cache"));
             parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+            //构建resultMap
             resultMapElements(context.evalNodes("/mapper/resultMap"));
             sqlElement(context.evalNodes("/mapper/sql"));
             buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
@@ -263,6 +264,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         Discriminator discriminator = null;
         //在同一个 resultMap 中数据是一致
         List<ResultMapping> resultMappings = new ArrayList<ResultMapping>();
+        //
         resultMappings.addAll(additionalResultMappings);
         //map的所有子类
         List<XNode> resultChildren = resultMapNode.getChildren();

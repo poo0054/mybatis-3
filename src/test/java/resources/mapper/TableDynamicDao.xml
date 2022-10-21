@@ -92,6 +92,7 @@
                sort
         from table_dynamic
         where table_code = #{tableCode}
+          and id = #{dyId}
     </select>
 
     <!--查询指定行数据-->

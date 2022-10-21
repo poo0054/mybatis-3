@@ -15,6 +15,7 @@
  */
 
 package poo0054.dao;
+
 import org.apache.ibatis.annotations.Param;
 import poo0054.entity.TableDynamic;
 
@@ -42,7 +43,7 @@ public interface TableDynamicDao {
      * @param tableCode
      * @return 实例对象
      */
-    TableDynamic queryByTableCode(String tableCode);
+    TableDynamic queryByTableCode(String tableCode, String dyId);
 
     /**
      * 查询指定行数据

@@ -35,17 +35,17 @@
     <!--  extends="com.poo0054.dao.TableAttributeDao.TableAttributeMap" 是继承那个父类的属性 -->
     <resultMap type="poo0054.entity.TableAttribute" id="TableAttributeMap">
         <!--   有参构造方法 -->
-        <constructor>
-            <arg column="id" javaType="string"/>
-            <arg column="name" javaType="string"/>
-            <arg column="border" javaType="INTEGER"/>
-        </constructor>
-        <!--        <result property="id1" column="id" javaType="string" jdbcType="VARCHAR"/>-->
+        <!-- <constructor>
+             <arg column="id" javaType="string"/>
+             <arg column="name" javaType="string"/>
+             <arg column="border" javaType="INTEGER"/>
+         </constructor>-->
+        <result property="id1" column="id" javaType="string" jdbcType="VARCHAR"/>
         <result property="tableCode" column="table_code" jdbcType="VARCHAR"/>
         <!--        <result property="name" column="name" jdbcType="VARCHAR"/>-->
-        <result property="url" column="url" jdbcType="VARCHAR"/>
-        <result property="urlType" column="url_type" jdbcType="VARCHAR"/>
         <result property="stripe" column="stripe" jdbcType="INTEGER"/>
+        <result property="urlType" column="url_type" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
         <!--        <result property="border" column="border" jdbcType="INTEGER"/>-->
         <result property="height" column="height" jdbcType="VARCHAR"/>
         <!--    1对1  -->
@@ -53,14 +53,12 @@
         <!--    条件查询 -->
         <discriminator javaType="string" column="table_code">
             <case value="package" resultType="poo0054.entity.TableDynamic">
-                <association property="tableCodes" column="{table_code}=tableCode"
-                             javaType="poo0054.entity.TableDynamic"
+                <association property="tableCodes" column="{tableCode}=table_code,{dyId=id}"
                              select="poo0054.dao.TableDynamicDao.queryByTableCode"/>
             </case>
 
             <case value="storage" resultType="poo0054.entity.TableDynamic">
                 <association property="id1" column="{id}=id1"
-                             javaType="poo0054.dao.TableDynamicDao"
                              select="poo0054.dao.TableDynamicDao.queryById"/>
             </case>
         </discriminator>
