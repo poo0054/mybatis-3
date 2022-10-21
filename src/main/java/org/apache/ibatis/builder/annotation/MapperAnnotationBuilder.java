@@ -78,17 +78,25 @@ public class MapperAnnotationBuilder {
     }
 
     public void parse() {
+        //类似 interface poo0054.dao.TableAttributeDao
         String resource = type.toString();
+        //是否加载过该文件
         if (!configuration.isResourceLoaded(resource)) {
+            //xml是否加载
             loadXmlResource();
+            //不需要重复加载
             configuration.addLoadedResource(resource);
+            // poo0054.dao.TableAttributeDao
             assistant.setCurrentNamespace(type.getName());
+            //处理cache
             parseCache();
+            //CacheRef
             parseCacheRef();
             Method[] methods = type.getMethods();
             for (Method method : methods) {
                 try {
                     // issue #237
+                    // 桥接方法不能进行处理
                     if (!method.isBridge()) {
                         parseStatement(method);
                     }
@@ -119,6 +127,9 @@ public class MapperAnnotationBuilder {
         // Spring may not know the real resource name so we check a flag
         // to prevent loading again a resource twice
         // this flag is set at XMLMapperBuilder#bindMapperForNamespace
+        //Spring可能不知道真正的资源名称，因此我们检查一个标志
+        //防止再次加载资源两次
+        //此标志设置在XMLMapperBuilderbindMapperForNamespace
         if (!configuration.isResourceLoaded("namespace:" + type.getName())) {
             String xmlResource = type.getName().replace('.', '/') + ".xml";
             InputStream inputStream = null;
@@ -242,9 +253,13 @@ public class MapperAnnotationBuilder {
         return null;
     }
 
+    /**
+     * 处理方法
+     */
     void parseStatement(Method method) {
         Class<?> parameterTypeClass = getParameterType(method);
         LanguageDriver languageDriver = getLanguageDriver(method);
+
         SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
         if (sqlSource != null) {
             Options options = method.getAnnotation(Options.class);
@@ -346,13 +361,16 @@ public class MapperAnnotationBuilder {
 
     private Class<?> getParameterType(Method method) {
         Class<?> parameterType = null;
+        //获取参数类型
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (Class<?> currentParameterType : parameterTypes) {
+            //参数是否为 RowBounds  或 ResultHandler
             if (!RowBounds.class.isAssignableFrom(currentParameterType) && !ResultHandler.class.isAssignableFrom(currentParameterType)) {
                 if (parameterType == null) {
                     parameterType = currentParameterType;
                 } else {
                     // issue #135
+                    //多个参数是 ParamMap
                     parameterType = ParamMap.class;
                 }
             }
@@ -413,13 +431,17 @@ public class MapperAnnotationBuilder {
 
     private SqlSource getSqlSourceFromAnnotations(Method method, Class<?> parameterType, LanguageDriver languageDriver) {
         try {
+            //只有一个 取出第一个
+
             Class<? extends Annotation> sqlAnnotationType = getSqlAnnotationType(method);
             Class<? extends Annotation> sqlProviderAnnotationType = getSqlProviderAnnotationType(method);
             if (sqlAnnotationType != null) {
                 if (sqlProviderAnnotationType != null) {
                     throw new BindingException("You cannot supply both a static SQL and SqlProvider to method named " + method.getName());
                 }
+                //获取sqlAnnotationType类型注解
                 Annotation sqlAnnotation = method.getAnnotation(sqlAnnotationType);
+                //获取 value 的值
                 final String[] strings = (String[]) sqlAnnotation.getClass().getMethod("value").invoke(sqlAnnotation);
                 return buildSqlSourceFromStrings(strings, parameterType, languageDriver);
             } else if (sqlProviderAnnotationType != null) {
@@ -434,6 +456,7 @@ public class MapperAnnotationBuilder {
 
     private SqlSource buildSqlSourceFromStrings(String[] strings, Class<?> parameterTypeClass, LanguageDriver languageDriver) {
         final StringBuilder sql = new StringBuilder();
+        //存在多个sql语句 中间添加
         for (String fragment : strings) {
             sql.append(fragment);
             sql.append(" ");

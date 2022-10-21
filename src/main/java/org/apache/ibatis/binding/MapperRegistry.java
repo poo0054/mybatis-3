@@ -73,6 +73,7 @@ public class MapperRegistry {
                 parser.parse();
                 loadCompleted = true;
             } finally {
+                //如果出现错误 需要删除
                 if (!loadCompleted) {
                     knownMappers.remove(type);
                 }

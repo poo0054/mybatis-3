@@ -452,6 +452,7 @@ public class XMLMapperBuilder extends BaseBuilder {
                     //Spring可能不知道真正的资源名称，因此我们设置了一个标志
                     //阻止从映射器接口再次加载此资源
                     //查看MapperAnnotationBuilderloadXmlResource
+                    //xml 文件 加上namespace
                     configuration.addLoadedResource("namespace:" + namespace);
                     //加载mapper
                     configuration.addMapper(boundType);

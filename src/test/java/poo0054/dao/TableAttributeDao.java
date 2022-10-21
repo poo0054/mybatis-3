@@ -16,6 +16,7 @@
 package poo0054.dao;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import poo0054.entity.TableAttribute;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public interface TableAttributeDao {
      * @param id 主键
      * @return 实例对象
      */
+    @Select("select * from ${wherePropertiesReplace} ")
     TableAttribute queryById(String id);
 
     /**

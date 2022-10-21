@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
+ * 解析 select|insert|update|delete 标签
+ *
  * @author Clinton Begin
  */
 public class XMLStatementBuilder extends BaseBuilder {
