@@ -152,7 +152,7 @@
     <!--  如果需要自定义 type使用全类名
     使用： <select id="selectByPhone" resultType="Author" databaseId="oracle">
      -->
-    <databaseIdProvider type="DB_VENDOR">
+    <databaseIdProvider type="VENDOR">
         <property name="MySQL" value="mysql"/>
         <property name="SQL Server" value="sqlserver"/>
         <property name="DB2" value="db2"/>

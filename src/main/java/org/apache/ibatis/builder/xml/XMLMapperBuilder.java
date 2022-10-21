@@ -87,8 +87,10 @@ public class XMLMapperBuilder extends BaseBuilder {
             //加载过的文件需要添加如config
             configuration.addLoadedResource(resource);
 
+            //绑定mapper
             bindMapperForNamespace();
         }
+        //重新构建未完成的对象
 
         parsePendingResultMaps();
         parsePendingCacheRefs();
@@ -112,6 +114,7 @@ public class XMLMapperBuilder extends BaseBuilder {
             //构建resultMap
             resultMapElements(context.evalNodes("/mapper/resultMap"));
             sqlElement(context.evalNodes("/mapper/sql"));
+            //解析 执行
             buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
         } catch (Exception e) {
             throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
@@ -119,18 +122,27 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
 
     private void buildStatementFromContext(List<XNode> list) {
+        //只加载当前对应的 DatabaseId
         if (configuration.getDatabaseId() != null) {
             buildStatementFromContext(list, configuration.getDatabaseId());
         }
         buildStatementFromContext(list, null);
     }
 
+    /**
+     * 构建 select|insert|update|delete
+     *
+     * @param list               select|insert|update|delete node
+     * @param requiredDatabaseId 默认的 DatabaseId
+     */
     private void buildStatementFromContext(List<XNode> list, String requiredDatabaseId) {
+        //循环不同标签
         for (XNode context : list) {
             final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
             try {
                 statementParser.parseStatementNode();
             } catch (IncompleteElementException e) {
+                //如果依赖错误 等待重新加载
                 configuration.addIncompleteStatement(statementParser);
             }
         }
@@ -338,7 +350,9 @@ public class XMLMapperBuilder extends BaseBuilder {
         for (XNode context : list) {
             String databaseId = context.getStringAttribute("databaseId");
             String id = context.getStringAttribute("id");
+            //添加namespace
             id = builderAssistant.applyCurrentNamespace(id, false);
+            //只有在当前 databaseId 与 sql的id一致才会加载
             if (databaseIdMatchesCurrent(id, databaseId, requiredDatabaseId)) {
                 sqlFragments.put(id, context);
             }
@@ -346,6 +360,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
 
     private boolean databaseIdMatchesCurrent(String id, String databaseId, String requiredDatabaseId) {
+        //是否有自定义 DatabaseId
         if (requiredDatabaseId != null) {
             if (!requiredDatabaseId.equals(databaseId)) {
                 return false;
@@ -355,6 +370,7 @@ public class XMLMapperBuilder extends BaseBuilder {
                 return false;
             }
             // skip this fragment if there is a previous one with a not null databaseId
+            // 如果前面有一个数据库ID为非空的片段，请跳过此片段
             if (this.sqlFragments.containsKey(id)) {
                 XNode context = this.sqlFragments.get(id);
                 if (context.getStringAttribute("databaseId") != null) {
@@ -422,16 +438,22 @@ public class XMLMapperBuilder extends BaseBuilder {
         if (namespace != null) {
             Class<?> boundType = null;
             try {
+                //获取当前类
                 boundType = Resources.classForName(namespace);
             } catch (ClassNotFoundException e) {
                 //ignore, bound type is not required
             }
             if (boundType != null) {
+                //是否注册过
                 if (!configuration.hasMapper(boundType)) {
                     // Spring may not know the real resource name so we set a flag
                     // to prevent loading again this resource from the mapper interface
                     // look at MapperAnnotationBuilder#loadXmlResource
+                    //Spring可能不知道真正的资源名称，因此我们设置了一个标志
+                    //阻止从映射器接口再次加载此资源
+                    //查看MapperAnnotationBuilderloadXmlResource
                     configuration.addLoadedResource("namespace:" + namespace);
+                    //加载mapper
                     configuration.addMapper(boundType);
                 }
             }
