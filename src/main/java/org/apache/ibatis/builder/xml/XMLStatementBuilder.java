@@ -97,7 +97,7 @@ public class XMLStatementBuilder extends BaseBuilder {
 
         // Parse the SQL (pre: <selectKey> and <include> were parsed and removed)
         //解析SQL（之前：＜selectKey＞和＜include＞被解析并删除）
-        //TODO 构建sqlSource
+        //  构建sqlSource
         SqlSource sqlSource = langDriver.createSqlSource(configuration, context, parameterTypeClass);
         String resultSets = context.getStringAttribute("resultSets");
         String keyProperty = context.getStringAttribute("keyProperty");
