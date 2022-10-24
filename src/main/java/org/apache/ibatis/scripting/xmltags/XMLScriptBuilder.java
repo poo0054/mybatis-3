@@ -92,11 +92,14 @@ public class XMLScriptBuilder extends BaseBuilder {
                     contents.add(new StaticTextSqlNode(data));
                 }
             } else if (child.getNode().getNodeType() == Node.ELEMENT_NODE) { // issue #628
+                //节点名称
                 String nodeName = child.getNode().getNodeName();
+                //各种标签处理器
                 NodeHandler handler = nodeHandlerMap.get(nodeName);
                 if (handler == null) {
                     throw new BuilderException("Unknown element <" + nodeName + "> in SQL statement.");
                 }
+                //递归调用  多层嵌套标签解析
                 handler.handleNode(child, contents);
                 isDynamic = true;
             }

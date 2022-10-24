@@ -70,6 +70,7 @@ public class MapperRegistry {
                 //否则，可以自动尝试绑定
                 //映射器解析器。如果类型已知，则不会尝试。
                 MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
+                //解析
                 parser.parse();
                 loadCompleted = true;
             } finally {

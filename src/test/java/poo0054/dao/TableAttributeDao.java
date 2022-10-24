@@ -35,7 +35,7 @@ public interface TableAttributeDao {
      * @param id 主键
      * @return 实例对象
      */
-    @Select("select * from ${wherePropertiesReplace} ")
+
     TableAttribute queryById(String id);
 
     /**
@@ -45,6 +45,7 @@ public interface TableAttributeDao {
      * @param pageable       分页对象
      * @return 对象列表
      */
+    @Select("select * from ${wherePropertiesReplace} where id = #{id1,jdbcType=VARCHAR,javaType=string} and table_code=#{tableCode}")
     List<TableAttribute> queryAllByLimit(TableAttribute tableAttribute);
 
     /**

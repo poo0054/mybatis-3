@@ -56,6 +56,7 @@ public class XMLLanguageDriver implements LanguageDriver {
             // issue #127
             //解析里面的 ${} 公告参数如果有 就替换
             script = PropertyParser.parse(script, configuration.getVariables());
+            //一般的都是普通的sql 加编译的
             TextSqlNode textSqlNode = new TextSqlNode(script);
             //是否存在${}
             if (textSqlNode.isDynamic()) {

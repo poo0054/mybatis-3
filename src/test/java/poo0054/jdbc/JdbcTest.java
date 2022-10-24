@@ -25,7 +25,7 @@ import java.sql.*;
  * @date 2022/10/12 17:56
  */
 
-public class JdbcExec {
+public class JdbcTest {
     public static void main(String[] args) {
         System.out.println("我无语");
     }
