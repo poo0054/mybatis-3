@@ -110,7 +110,7 @@
             <if test="id1 != null and id1 != ''">
                 and id = #{id1}
             </if>
-            <if test="tableCode != null and tableCode != ''">
+            <if test="tableCode != null ">
                 and table_code = #{tableCode}
             </if>
             <if test="name != null and name != ''">

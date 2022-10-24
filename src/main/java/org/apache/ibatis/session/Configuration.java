@@ -556,6 +556,13 @@ public class Configuration {
         return newExecutor(transaction, defaultExecutorType);
     }
 
+    /**
+     * 创建 Executor
+     *
+     * @param transaction
+     * @param executorType
+     * @return
+     */
     public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
         executorType = executorType == null ? defaultExecutorType : executorType;
         executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
@@ -565,11 +572,14 @@ public class Configuration {
         } else if (ExecutorType.REUSE == executorType) {
             executor = new ReuseExecutor(this, transaction);
         } else {
+            //默认
             executor = new SimpleExecutor(this, transaction);
         }
+        //是否开启缓存
         if (cacheEnabled) {
             executor = new CachingExecutor(executor);
         }
+        //拦截器匹配成功创建代理对象
         executor = (Executor) interceptorChain.pluginAll(executor);
         return executor;
     }

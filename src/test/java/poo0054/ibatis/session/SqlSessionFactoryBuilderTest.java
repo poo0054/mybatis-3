@@ -59,9 +59,11 @@ public class SqlSessionFactoryBuilderTest {
 
     @Test
     public void queryAllByLimit() {
-        //每次都是一个新的sqlSession
+        //每次都是一个新的sqlSession  其中 executor 匹配成功就是一个代理对象
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            //从mapperRegistry中获取MapperProxy代理对象
             TableAttributeDao roleMapper = sqlSession.getMapper(TableAttributeDao.class);
+            //执行该代码 真正会执行MapperProxy的invoke方法
             List<TableAttribute> sysUser = roleMapper.queryAllByLimit(new TableAttribute(null, null, null));
             for (TableAttribute tableAttribute : sysUser) {
                 System.out.println(tableAttribute);

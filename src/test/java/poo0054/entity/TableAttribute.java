@@ -17,6 +17,7 @@ package poo0054.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -28,6 +29,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
+@ToString
 public class TableAttribute implements Serializable {
     private static final long serialVersionUID = -43176302154601050L;
     /**

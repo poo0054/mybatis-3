@@ -109,6 +109,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             reflectorFactoryElement(root.evalNode("reflectorFactory"));
             settingsElement(settings);
             // read it after objectFactory and objectWrapperFactory issue #631
+            //环境构建
             environmentsElement(root.evalNode("environments"));
             databaseIdProviderElement(root.evalNode("databaseIdProvider"));
             typeHandlerElement(root.evalNode("typeHandlers"));
@@ -268,13 +269,19 @@ public class XMLConfigBuilder extends BaseBuilder {
     private void environmentsElement(XNode context) throws Exception {
         if (context != null) {
             if (environment == null) {
+                //获取默认名称
                 environment = context.getStringAttribute("default");
             }
             for (XNode child : context.getChildren()) {
+                //当前环境id
                 String id = child.getStringAttribute("id");
+                //是否为默认的环境
                 if (isSpecifiedEnvironment(id)) {
+                    //构建事务工厂
                     TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+                    //构建数据源工厂
                     DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
+                    //获取数据源
                     DataSource dataSource = dsFactory.getDataSource();
                     Environment.Builder environmentBuilder = new Environment.Builder(id)
                             .transactionFactory(txFactory)
@@ -307,7 +314,9 @@ public class XMLConfigBuilder extends BaseBuilder {
 
     private TransactionFactory transactionManagerElement(XNode context) throws Exception {
         if (context != null) {
+            //获取type
             String type = context.getStringAttribute("type");
+            //获取所有参数  并且使用
             Properties props = context.getChildrenAsProperties();
             TransactionFactory factory = (TransactionFactory) resolveClass(type).newInstance();
             factory.setProperties(props);
