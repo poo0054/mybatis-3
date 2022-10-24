@@ -102,7 +102,7 @@
     </select>
 
     <!--查询指定行数据-->
-    <select id="queryAllByLimit" resultMap="TableAttributeMap">
+    <select id="queryAllByLimitXml" resultMap="TableAttributeMap">
         select
         id, table_code, name, url, url_type, stripe, border, height
         from table_attribute

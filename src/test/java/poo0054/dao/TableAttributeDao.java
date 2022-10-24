@@ -16,7 +16,6 @@
 package poo0054.dao;
 
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import poo0054.entity.TableAttribute;
 
 import java.util.List;
@@ -45,7 +44,7 @@ public interface TableAttributeDao {
      * @param pageable       分页对象
      * @return 对象列表
      */
-    @Select("select * from ${wherePropertiesReplace} where id = #{id1,jdbcType=VARCHAR,javaType=string} and table_code=#{tableCode}")
+//    @Select("select * from ${wherePropertiesReplace} where id = #{id1,jdbcType=VARCHAR,javaType=string} and table_code=#{tableCode}")
     List<TableAttribute> queryAllByLimit(TableAttribute tableAttribute);
 
     /**
