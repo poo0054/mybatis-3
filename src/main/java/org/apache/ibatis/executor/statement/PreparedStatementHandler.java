@@ -28,6 +28,8 @@ import java.sql.*;
 import java.util.List;
 
 /**
+ * 使用 PreparedStatement
+ *
  * @author Clinton Begin
  */
 public class PreparedStatementHandler extends BaseStatementHandler {
@@ -57,6 +59,7 @@ public class PreparedStatementHandler extends BaseStatementHandler {
     public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
         PreparedStatement ps = (PreparedStatement) statement;
         ps.execute();
+        //封装并返回结果
         return resultSetHandler.<E>handleResultSets(ps);
     }
 
