@@ -546,8 +546,20 @@ public class Configuration {
         return resultSetHandler;
     }
 
+    /**
+     * 创建 StatementHandler 对象 如果插件匹配就创建 Plugin 创建代理对象优先执行 Plugin的方法
+     *
+     * @param executor        mybatis的执行 中间有缓存 调用StatementHandler的执行方法
+     * @param mappedStatement mapper接口的个个方法封装
+     * @param parameterObject 参数对象
+     * @param rowBounds       分页
+     * @param resultHandler   返回结果处理器
+     * @param boundSql        处理后的sql
+     * @return StatementHandler
+     */
     public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
         StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
+        //拦截器匹配成功就创建一个代理对象进行处理
         statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
         return statementHandler;
     }

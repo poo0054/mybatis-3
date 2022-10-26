@@ -229,7 +229,9 @@ public class MapperAnnotationBuilder {
 
     private void applyResultMap(String resultMapId, Class<?> returnType, Arg[] args, Result[] results, TypeDiscriminator discriminator) {
         List<ResultMapping> resultMappings = new ArrayList<ResultMapping>();
+        //构造方法
         applyConstructorArgs(args, returnType, resultMappings);
+        // Result
         applyResults(results, returnType, resultMappings);
         Discriminator disc = applyDiscriminator(resultMapId, returnType, discriminator);
         // TODO add AutoMappingBehaviour

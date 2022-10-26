@@ -54,6 +54,9 @@ public abstract class BaseExecutor implements Executor {
     protected Executor wrapper;
 
     protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
+    /**
+     * 一级缓存
+     */
     protected PerpetualCache localCache;
     protected PerpetualCache localOutputParameterCache;
     protected Configuration configuration;
@@ -143,15 +146,19 @@ public abstract class BaseExecutor implements Executor {
             throw new ExecutorException("Executor was closed.");
         }
         if (queryStack == 0 && ms.isFlushCacheRequired()) {
+            //清除本地缓存
             clearLocalCache();
         }
         List<E> list;
         try {
             queryStack++;
+            //resultHandler为空就查找本地缓存
             list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
             if (list != null) {
+                //不为空 处理存储过程
                 handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
             } else {
+                //查询数据库
                 list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
             }
         } finally {
@@ -163,6 +170,7 @@ public abstract class BaseExecutor implements Executor {
             }
             // issue #601
             deferredLoads.clear();
+            //缓存作用率
             if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
                 // issue #482
                 clearLocalCache();
@@ -319,14 +327,18 @@ public abstract class BaseExecutor implements Executor {
 
     private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
         List<E> list;
+        //先缓存
         localCache.putObject(key, EXECUTION_PLACEHOLDER);
         try {
             list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
         } finally {
+            //删除改数据
             localCache.removeObject(key);
         }
+        //缓存
         localCache.putObject(key, list);
         if (ms.getStatementType() == StatementType.CALLABLE) {
+            //缓存参数
             localOutputParameterCache.putObject(key, parameter);
         }
         return list;

@@ -60,7 +60,7 @@ public class Plugin implements InvocationHandler {
     public static Object wrap(Object target, Interceptor interceptor) {
         Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
         Class<?> type = target.getClass();
-        //获取匹配成功的对象
+        //根据target匹配type 匹配成功就创建一个代理对象
         Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
         if (interfaces.length > 0) {
             //jdk动态代理创建
@@ -108,7 +108,7 @@ public class Plugin implements InvocationHandler {
         Signature[] sigs = interceptsAnnotation.value();
         Map<Class<?>, Set<Method>> signatureMap = new HashMap<Class<?>, Set<Method>>();
         for (Signature sig : sigs) {
-            //不存在就添加 type
+            //key :type value 根据 method的args参数匹配方法
             Set<Method> methods = signatureMap.get(sig.type());
             if (methods == null) {
                 methods = new HashSet<Method>();

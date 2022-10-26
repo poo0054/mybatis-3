@@ -67,7 +67,7 @@ public class XMLScriptBuilder extends BaseBuilder {
         //构建 MixedSqlNode 并判断里面是否存在${}
         MixedSqlNode rootSqlNode = parseDynamicTags(context);
         SqlSource sqlSource = null;
-        //是否有 ${}
+        //是否有 ${} 或者嵌套的sql
         if (isDynamic) {
             sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
         } else {
@@ -101,6 +101,7 @@ public class XMLScriptBuilder extends BaseBuilder {
                 }
                 //递归调用  多层嵌套标签解析
                 handler.handleNode(child, contents);
+                //存在多层嵌套
                 isDynamic = true;
             }
         }

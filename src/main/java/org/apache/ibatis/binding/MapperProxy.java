@@ -35,7 +35,13 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
 
     private static final long serialVersionUID = -6424540398559729838L;
     private final SqlSession sqlSession;
+    /**
+     * mapper接口
+     */
     private final Class<T> mapperInterface;
+    /**
+     * 一个内部的缓存
+     */
     private final Map<Method, MapperMethod> methodCache;
 
     public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethod> methodCache) {
@@ -56,7 +62,9 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         } catch (Throwable t) {
             throw ExceptionUtil.unwrapThrowable(t);
         }
+        //从缓存中获取 不存在则新建
         final MapperMethod mapperMethod = cachedMapperMethod(method);
+        //执行
         return mapperMethod.execute(sqlSession, args);
     }
 
@@ -64,6 +72,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         MapperMethod mapperMethod = methodCache.get(method);
         if (mapperMethod == null) {
             mapperMethod = new MapperMethod(mapperInterface, method, sqlSession.getConfiguration());
+            //缓存
             methodCache.put(method, mapperMethod);
         }
         return mapperMethod;

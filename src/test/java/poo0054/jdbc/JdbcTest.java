@@ -39,10 +39,12 @@ public class JdbcTest {
 
         Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.56.10:3306/yidian_oms", "root", "root");
 
-        String sql = " select * from sys_user";
+        String sql = " select * from sys_user ";
 
         //preparedStatement
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
+//        preparedStatement.setString(/*1, "");
+//        preparedStatement.setString(*/2, "");
         ResultSet resultSet1 = preparedStatement.executeQuery();
         print(resultSet1);
 

@@ -64,7 +64,9 @@ public class SqlSessionFactoryBuilderTest {
             //从mapperRegistry中获取MapperProxy代理对象
             TableAttributeDao roleMapper = sqlSession.getMapper(TableAttributeDao.class);
             //执行该代码 真正会执行MapperProxy的invoke方法
-            List<TableAttribute> sysUser = roleMapper.queryAllByLimit(new TableAttribute(null, null, null));
+            TableAttribute tableAttribute1 = new TableAttribute(null, null, null);
+            tableAttribute1.setTableCode("package");
+            List<TableAttribute> sysUser = roleMapper.queryAllByLimit(tableAttribute1);
             for (TableAttribute tableAttribute : sysUser) {
                 System.out.println(tableAttribute);
             }

@@ -31,6 +31,9 @@ public class MapperProxyFactory<T> {
      * 当前的mapper接口
      */
     private final Class<T> mapperInterface;
+    /**
+     * 缓存
+     */
     private final Map<Method, MapperMethod> methodCache = new ConcurrentHashMap<Method, MapperMethod>();
 
     public MapperProxyFactory(Class<T> mapperInterface) {
