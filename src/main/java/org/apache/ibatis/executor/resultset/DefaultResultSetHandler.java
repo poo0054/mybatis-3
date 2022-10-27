@@ -67,18 +67,30 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     private final ReflectorFactory reflectorFactory;
 
     // nested resultmaps
+    /**
+     * 嵌套结果图
+     */
     private final Map<CacheKey, Object> nestedResultObjects = new HashMap<CacheKey, Object>();
     private final Map<String, Object> ancestorObjects = new HashMap<String, Object>();
     private Object previousRowValue;
 
     // multiple resultsets
+    /**
+     * 多个结果集
+     */
     private final Map<String, ResultMapping> nextResultMaps = new HashMap<String, ResultMapping>();
     private final Map<CacheKey, List<PendingRelation>> pendingRelations = new HashMap<CacheKey, List<PendingRelation>>();
 
     // Cached Automappings
+    /**
+     * 缓存的自动映射
+     */
     private final Map<String, List<UnMappedColumnAutoMapping>> autoMappingsCache = new HashMap<String, List<UnMappedColumnAutoMapping>>();
 
     // temporary marking flag that indicate using constructor mapping (use field to reduce memory usage)
+    /**
+     * 指示使用构造函数映射的临时标记标志（使用字段减少内存使用）
+     */
     private boolean useConstructorMappings;
 
     private final PrimitiveTypes primitiveTypes;
@@ -118,7 +130,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
 
     //
-    // HANDLE OUTPUT PARAMETER
+    // HANDLE OUTPUT PARAMETER 句柄输出参数
     //
 
     @Override

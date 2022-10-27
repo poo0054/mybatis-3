@@ -69,8 +69,6 @@ public class TableAttribute implements Serializable {
      */
     private TableDynamic tableCodes;
 
-    public TableAttribute() {
-    }
 
     public TableAttribute(String id1, String name, Integer border) {
         this.id1 = id1;

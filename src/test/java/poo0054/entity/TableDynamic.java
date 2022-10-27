@@ -16,7 +16,6 @@
 package poo0054.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -27,8 +26,8 @@ import java.io.Serializable;
  * @since 2022-10-18 14:18:59
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class TableDynamic extends TableAttribute implements Serializable {
+//@EqualsAndHashCode(callSuper = true)
+public class TableDynamic implements Serializable {
     private static final long serialVersionUID = 917318128171082841L;
     /**
      * 主键
@@ -99,5 +98,9 @@ public class TableDynamic extends TableAttribute implements Serializable {
      */
     private Integer sort;
 
+    public TableDynamic(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
 
