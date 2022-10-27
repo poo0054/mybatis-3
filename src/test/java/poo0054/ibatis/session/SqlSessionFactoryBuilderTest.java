@@ -28,6 +28,7 @@ import poo0054.entity.TableAttribute;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author ZhangZhi
@@ -58,6 +59,22 @@ public class SqlSessionFactoryBuilderTest {
 
     @Test
     public void queryAllByLimit() {
+        //每次都是一个新的sqlSession  其中 executor 匹配成功就是一个代理对象
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            //从mapperRegistry中获取MapperProxy代理对象
+            TableAttributeDao roleMapper = sqlSession.getMapper(TableAttributeDao.class);
+            //执行该代码 真正会执行MapperProxy的invoke方法
+            TableAttribute tableAttribute1 = new TableAttribute(null, null, null);
+            tableAttribute1.setTableCode("package");
+            List<TableAttribute> sysUser = roleMapper.queryAllByLimit(tableAttribute1);
+            for (TableAttribute tableAttribute : sysUser) {
+                System.out.println(tableAttribute);
+            }
+        }
+    }
+
+    @Test
+    public void queryById() {
         //每次都是一个新的sqlSession  其中 executor 匹配成功就是一个代理对象
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             //从mapperRegistry中获取MapperProxy代理对象
