@@ -98,6 +98,9 @@ public class TableDynamic implements Serializable {
      */
     private Integer sort;
 
+    public TableDynamic() {
+    }
+
     public TableDynamic(String id, String name) {
         this.id = id;
         this.name = name;
