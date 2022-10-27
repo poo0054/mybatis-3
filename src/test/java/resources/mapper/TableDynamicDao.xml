@@ -24,6 +24,12 @@
     <cache-ref namespace="poo0054.dao.TableAttributeDao"/>
 
     <resultMap type="poo0054.entity.TableDynamic" id="TableDynamicMap">
+        <!--   有参构造方法 -->
+        <constructor>
+            <arg column="id" javaType="string"/>
+            <arg column="name" javaType="string"/>
+        </constructor>
+
         <result property="id" column="id" jdbcType="VARCHAR"/>
         <result property="tableCode" column="table_code" jdbcType="VARCHAR"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
@@ -41,6 +47,7 @@
         <result property="showSearch" column="show_search" jdbcType="INTEGER"/>
         <result property="placeholder" column="placeholder" jdbcType="VARCHAR"/>
         <result property="sort" column="sort" jdbcType="INTEGER"/>
+
     </resultMap>
 
     <parameterMap id="parmeterSysUser" type="poo0054.entity.TableDynamic">

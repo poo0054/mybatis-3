@@ -35,8 +35,8 @@ public class TableDynamic implements Serializable {
     private String id;
     /*    *//**
      * 表id
-     *//*
-    private String tableCode;*/
+     */
+    private String tableCode;
     /**
      * 表格名称
      */
