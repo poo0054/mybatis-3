@@ -77,20 +77,5 @@ public class TableAttribute implements Serializable {
         this.name = name;
         this.border = border;
     }
-
-    @Override
-    public String toString() {
-        return "TableAttribute{" +
-                "id1='" + id1 + '\'' +
-                ", tableCode='" + tableCode + '\'' +
-                ", name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                ", urlType='" + urlType + '\'' +
-                ", stripe=" + stripe +
-                ", border=" + border +
-                ", height='" + height + '\'' +
-                ", tableCodes=" + tableCodes +
-                '}';
-    }
 }
 
