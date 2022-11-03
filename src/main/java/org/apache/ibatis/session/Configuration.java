@@ -160,6 +160,9 @@ public class Configuration {
         this.environment = environment;
     }
 
+    /**
+     * 创建出 Configuration 并加载类型别名处理器 DefaultDriver
+     */
     public Configuration() {
         typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
         typeAliasRegistry.registerAlias("MANAGED", ManagedTransactionFactory.class);
@@ -747,6 +750,11 @@ public class Configuration {
         mapperRegistry.addMappers(packageName, superType);
     }
 
+    /**
+     * 解析 packageName
+     *
+     * @param packageName packageName路径
+     */
     public void addMappers(String packageName) {
         mapperRegistry.addMappers(packageName);
     }

@@ -234,7 +234,7 @@ class PooledConnection implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
-        //如果是取消方法 就不真正的关闭链接 而是从小放入连接池
+        //如果是取消方法 就不真正的关闭链接 而是放入连接池
         if (CLOSE.hashCode() == methodName.hashCode() && CLOSE.equals(methodName)) {
             dataSource.pushConnection(this);
             return null;

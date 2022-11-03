@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package poo0054;
+package poo0054.parsing;
 
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.io.Resources;

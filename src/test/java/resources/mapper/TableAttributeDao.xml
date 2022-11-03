@@ -35,11 +35,11 @@
     <!--  extends="com.poo0054.dao.TableAttributeDao.TableAttributeMap" 是继承那个父类的属性 -->
     <resultMap type="poo0054.entity.TableAttribute" id="TableAttributeMap">
         <!--   有参构造方法 -->
-       <!-- <constructor>
-            <arg column="id" javaType="string"/>
-            <arg column="name" javaType="string"/>
-            <arg column="border" javaType="INTEGER"/>
-        </constructor>-->
+        <!-- <constructor>
+             <arg column="id" javaType="string"/>
+             <arg column="name" javaType="string"/>
+             <arg column="border" javaType="INTEGER"/>
+         </constructor>-->
         <result property="id1" column="id" javaType="string" jdbcType="VARCHAR"/>
         <result property="tableCode" column="table_code" jdbcType="VARCHAR"/>
         <!--        <result property="name" column="name" jdbcType="VARCHAR"/>-->

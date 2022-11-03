@@ -35,6 +35,13 @@ public class XNode {
     private final Properties variables;
     private final XPathParser xpathParser;
 
+    /**
+     * 唯一构造 并解析当前节点的attribute
+     *
+     * @param xpathParser xpath 的封装
+     * @param node        当前节点
+     * @param variables   公共参数
+     */
     public XNode(XPathParser xpathParser, Node node, Properties variables) {
         this.xpathParser = xpathParser;
         this.node = node;
@@ -292,11 +299,15 @@ public class XNode {
 
     public List<XNode> getChildren() {
         List<XNode> children = new ArrayList<XNode>();
+        //获取所有的子节点
         NodeList nodeList = node.getChildNodes();
         if (nodeList != null) {
             for (int i = 0, n = nodeList.getLength(); i < n; i++) {
+                //当前子节点
                 Node node = nodeList.item(i);
+                // 节点为 node
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    // 构建出XNode
                     children.add(new XNode(xpathParser, node, variables));
                 }
             }
@@ -307,7 +318,9 @@ public class XNode {
     public Properties getChildrenAsProperties() {
         Properties properties = new Properties();
         for (XNode child : getChildren()) {
+            //获取name
             String name = child.getStringAttribute("name");
+            //获取value
             String value = child.getStringAttribute("value");
             if (name != null && value != null) {
                 properties.setProperty(name, value);
@@ -350,12 +363,20 @@ public class XNode {
         return builder.toString();
     }
 
+    /**
+     * 获取node的所有信息
+     *
+     * @param n
+     * @return
+     */
     private Properties parseAttributes(Node n) {
         Properties attributes = new Properties();
+        //获取所有的 Attributes 封装成 Properties
         NamedNodeMap attributeNodes = n.getAttributes();
         if (attributeNodes != null) {
             for (int i = 0; i < attributeNodes.getLength(); i++) {
                 Node attribute = attributeNodes.item(i);
+                //如果存在 ${} 的值 就解析为 variables的值
                 String value = PropertyParser.parse(attribute.getNodeValue(), variables);
                 attributes.put(attribute.getNodeName(), value);
             }

@@ -45,7 +45,7 @@ public interface TableAttributeDao {
      * @param pageable       分页对象
      * @return 对象列表
      */
-    @Select("<script> select * from ${wherePropertiesReplace} " +
+    @Select("<script> select * from ${wherePropertiesReplace}" +
             "<where> " +
             "<if test='null != id1'> id = #{id1,jdbcType=VARCHAR,javaType=string} </if> " +
             " <if test = 'null != tableCode' > and table_code=#{tableCode} </if> " +

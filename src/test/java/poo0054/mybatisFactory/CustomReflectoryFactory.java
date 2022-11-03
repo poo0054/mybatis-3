@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  * @date 2022/10/14 16:46
  */
 public class CustomReflectoryFactory implements ReflectorFactory {
+
     private boolean classCacheEnabled = true;
     private final ConcurrentMap<Class<?>, Reflector> reflectorMap = new ConcurrentHashMap<>();
 

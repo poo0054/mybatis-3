@@ -60,12 +60,20 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
         this.properties = p;
     }
 
+    /**
+     * 根据当前数据源获取数据库数据库厂商标识
+     *
+     * @param dataSource 数据源
+     */
     private String getDatabaseName(DataSource dataSource) throws SQLException {
+        // 检索此数据库产品的名称
         String productName = getDatabaseProductName(dataSource);
         //如果没有设置 databaseIdProvider 就是要当前数据库的类型
         if (this.properties != null) {
+            // properties 如果匹配
             for (Map.Entry<Object, Object> property : properties.entrySet()) {
                 if (productName.contains((String) property.getKey())) {
+                    //返回value
                     return (String) property.getValue();
                 }
             }
@@ -75,6 +83,11 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
         return productName;
     }
 
+    /**
+     * 检索此数据库产品的名称
+     *
+     * @param dataSource 数据源
+     */
     private String getDatabaseProductName(DataSource dataSource) throws SQLException {
         Connection con = null;
         try {

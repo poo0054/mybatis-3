@@ -74,6 +74,7 @@ public class SqlSessionFactoryBuilder {
 
     public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
         try {
+            //创建 XMLConfigBuilder
             XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
             //构建Configuration并返回 SqlSessionFactory
             return build(parser.parse());

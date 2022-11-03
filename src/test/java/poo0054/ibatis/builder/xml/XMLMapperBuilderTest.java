@@ -23,7 +23,7 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.session.Configuration;
 import org.junit.Before;
 import org.junit.Test;
-import poo0054.SimpleBuildUtils;
+import poo0054.parsing.SimpleBuildUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
