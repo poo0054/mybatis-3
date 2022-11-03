@@ -233,7 +233,7 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
-    private void settingsElement(Properties props) throws Exception {
+    private void settingsElement(Properties props) {
         configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(props.getProperty("autoMappingBehavior", "PARTIAL")));
         configuration.setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior.valueOf(props.getProperty("autoMappingUnknownColumnBehavior", "NONE")));
         configuration.setCacheEnabled(booleanValueOf(props.getProperty("cacheEnabled"), true));
@@ -262,6 +262,7 @@ public class XMLConfigBuilder extends BaseBuilder {
         configuration.setLogPrefix(props.getProperty("logPrefix"));
         @SuppressWarnings("unchecked")
         Class<? extends Log> logImpl = (Class<? extends Log>) resolveClass(props.getProperty("logImpl"));
+        //构建mybatis日志
         configuration.setLogImpl(logImpl);
         configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
     }
@@ -363,11 +364,18 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * resource 和 url 是使用xmlMapperBuilder 进行解析
+     * package 和 mapperClass 使用 mapperRegistry 解析 -- MapperAnnotationBuilder 解析
+     *
+     * @param parent mapper
+     */
     private void mapperElement(XNode parent) throws Exception {
         if (parent != null) {
             for (XNode child : parent.getChildren()) {
                 if ("package".equals(child.getName())) {
                     String mapperPackage = child.getStringAttribute("name");
+                    //使用 mapperRegistry mapper得xml 和 class 路径必须要一致
                     configuration.addMappers(mapperPackage);
                 } else {
                     String resource = child.getStringAttribute("resource");

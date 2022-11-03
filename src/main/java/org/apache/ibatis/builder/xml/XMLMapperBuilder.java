@@ -90,7 +90,7 @@ public class XMLMapperBuilder extends BaseBuilder {
             //绑定mapper
             bindMapperForNamespace();
         }
-        //重新构建未完成的对象
+        //重新构建未完成的对象  可能引用了未加载完成得mapper 需要等待引用得加载
 
         parsePendingResultMaps();
         parsePendingCacheRefs();

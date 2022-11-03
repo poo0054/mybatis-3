@@ -51,7 +51,7 @@
         <!--    1对1  -->
         <!--    <association property="companyadmin" />-->
         <!--    条件查询 -->
-        <discriminator javaType="string" column="table_code">
+        <!--<discriminator javaType="string" column="table_code">
             <case value="package" resultType="poo0054.entity.TableDynamic">
                 <association property="tableCodes" column="{tableCode}=table_code,{dyId=id}"
                              select="poo0054.dao.TableDynamicDao.queryByTableCode"/>
@@ -61,7 +61,7 @@
                 <association property="id1" column="{id}=id1"
                              select="poo0054.dao.TableDynamicDao.queryById"/>
             </case>
-        </discriminator>
+        </discriminator>-->
     </resultMap>
 
     <!-- <resultMap type="poo0054.entity.TableAttribute" id="CopyTableAttributeMap">

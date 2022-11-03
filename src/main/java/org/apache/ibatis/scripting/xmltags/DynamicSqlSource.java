@@ -43,7 +43,7 @@ public class DynamicSqlSource implements SqlSource {
         SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
         //参数类型
         Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
-        //构建出 StaticSqlSource
+        //构建出 StaticSqlSource 使用静态sql  构建出 BoundSql
         SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         for (Map.Entry<String, Object> entry : context.getBindings().entrySet()) {

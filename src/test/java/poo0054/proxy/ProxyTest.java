@@ -19,7 +19,10 @@ public class ProxyTest {
     @Test
     public void t() throws NoSuchMethodException {
         Method method1 = ProxyTest.class.getMethod("test");
-        ProxyIn proxyHandle = (ProxyIn) Proxy.newProxyInstance(ProxyHandle.class.getClassLoader(), new Class[]{ProxyIn.class}, new ProxyHandle(new ProxyTest(), method1));
+        ProxyInterface proxyHandle =
+                (ProxyInterface) Proxy.newProxyInstance(ProxyHandle.class.getClassLoader(),
+                        new Class[]{ProxyInterface.class},
+                        new ProxyHandle(new ProxyTest(), method1));
         proxyHandle.t();
     }
 }
