@@ -295,6 +295,7 @@ public final class MappedStatement {
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
+        //根据参数构建出sql
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         //参数对象
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();

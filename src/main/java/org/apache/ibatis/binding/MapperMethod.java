@@ -65,22 +65,27 @@ public class MapperMethod {
         //根据不同的sql执行不同方法
 
         switch (command.getType()) {
+            //插入方法
             case INSERT: {
                 Object param = method.convertArgsToSqlCommandParam(args);
                 result = rowCountResult(sqlSession.insert(command.getName(), param));
                 break;
             }
+            //修改方法
             case UPDATE: {
                 Object param = method.convertArgsToSqlCommandParam(args);
                 result = rowCountResult(sqlSession.update(command.getName(), param));
                 break;
             }
+            //删除方法
             case DELETE: {
                 Object param = method.convertArgsToSqlCommandParam(args);
                 result = rowCountResult(sqlSession.delete(command.getName(), param));
                 break;
             }
+            //查询方法
             case SELECT:
+                //根据返回结果 执行不同方法
                 if (method.returnsVoid() && method.hasResultHandler()) {
                     executeWithResultHandler(sqlSession, args);
                     result = null;
@@ -88,10 +93,13 @@ public class MapperMethod {
                     //集合
                     result = executeForMany(sqlSession, args);
                 } else if (method.returnsMap()) {
+                    //返回map
                     result = executeForMap(sqlSession, args);
                 } else if (method.returnsCursor()) {
+                    // Cursor 类型
                     result = executeForCursor(sqlSession, args);
                 } else {
+                    //单个查询
                     Object param = method.convertArgsToSqlCommandParam(args);
                     result = sqlSession.selectOne(command.getName(), param);
                 }
@@ -152,6 +160,7 @@ public class MapperMethod {
             RowBounds rowBounds = method.extractRowBounds(args);
             result = sqlSession.<E>selectList(command.getName(), param, rowBounds);
         } else {
+            //查询
             result = sqlSession.<E>selectList(command.getName(), param);
         }
         // issue #510 Collections & arrays support

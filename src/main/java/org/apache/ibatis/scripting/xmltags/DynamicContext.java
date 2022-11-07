@@ -37,6 +37,9 @@ public class DynamicContext {
         OgnlRuntime.setPropertyAccessor(ContextMap.class, new ContextAccessor());
     }
 
+    /**
+     * 根据实际创建参数，并添加 数据库id
+     */
     private final ContextMap bindings;
     /**
      * 完整sql

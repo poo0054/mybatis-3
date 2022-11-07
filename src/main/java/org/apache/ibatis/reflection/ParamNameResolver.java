@@ -78,11 +78,12 @@ public class ParamNameResolver {
                     break;
                 }
             }
+            //没有@param 注解 就使用下标或者名称
             if (name == null) {
                 // @Param was not specified. @未指定参数。
                 //没有@param注解
                 if (config.isUseActualParamName()) {
-                    //获取下标为paramIndex的方法
+                    //获取下标为paramIndex的名称
                     name = getActualParamName(method, paramIndex);
                 }
                 if (name == null) {
