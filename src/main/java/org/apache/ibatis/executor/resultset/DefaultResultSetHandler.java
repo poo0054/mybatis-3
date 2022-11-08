@@ -179,18 +179,20 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     @Override
     public List<Object> handleResultSets(Statement stmt) throws SQLException {
         ErrorContext.instance().activity("handling results").object(mappedStatement.getId());
-
+        //返回结果集合
         final List<Object> multipleResults = new ArrayList<Object>();
-
         int resultSetCount = 0;
         //封装成 ResultSetWrapper
         ResultSetWrapper rsw = getFirstResultSet(stmt);
         //饭himap
         List<ResultMap> resultMaps = mappedStatement.getResultMaps();
+        //ResultMap的大小
         int resultMapCount = resultMaps.size();
+        //校验不能为空
         validateResultMapsCount(rsw, resultMapCount);
+        //循环 resultMapCount
         while (rsw != null && resultMapCount > resultSetCount) {
-            //根据 resultSetCount 获取
+            //根据 获取 ResultMap
             ResultMap resultMap = resultMaps.get(resultSetCount);
             /*
             真正进行赋值操作
@@ -237,6 +239,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         return new DefaultCursor<E>(this, resultMap, rsw, rowBounds);
     }
 
+    /**
+     * 根据 Statement 获取 ResultSet 封装成 ResultSetWrapper
+     */
     private ResultSetWrapper getFirstResultSet(Statement stmt) throws SQLException {
         //获取ResultSet 也会进入 PreparedStatementLogger 代理对象创建 代理 ResultSetLogger对象
         ResultSet rs = stmt.getResultSet();
@@ -361,7 +366,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         DefaultResultContext<Object> resultContext = new DefaultResultContext<Object>();
         //此方法为mybatis 的分页 跳过偏移量进行分页
         skipRows(rsw.getResultSet(), rowBounds);
-        //校验并跳过
+        //根据rowBound查询多少个  并 next
         while (shouldProcessMoreRows(resultContext, rowBounds) && rsw.getResultSet().next()) {
             ResultMap discriminatedResultMap = resolveDiscriminatedResultMap(rsw.getResultSet(), resultMap, null);
             //构建返回对象
@@ -410,6 +415,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
     //
     // GET VALUE FROM ROW FOR SIMPLE RESULT MAP
+    // 从简单结果映射的行中获取值
     //
 
     private Object getRowValue(ResultSetWrapper rsw, ResultMap resultMap) throws SQLException {
@@ -848,7 +854,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
 
     //
-    // DISCRIMINATOR
+    // DISCRIMINATOR 鉴别器
     //
 
     public ResultMap resolveDiscriminatedResultMap(ResultSet rs, ResultMap resultMap, String columnPrefix) throws SQLException {

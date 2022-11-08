@@ -45,6 +45,7 @@ public class JdbcTest {
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
 //        preparedStatement.setString(/*1, "");
 //        preparedStatement.setString(*/2, "");
+        preparedStatement.execute();
         ResultSet resultSet1 = preparedStatement.executeQuery();
         print(resultSet1);
 
